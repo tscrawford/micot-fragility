@@ -119,7 +119,7 @@
 					"allOf": 
 					[
 						{
-							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geojson_schema_geometry.json"
+							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geometry.json"
 						}
 					]
 				},

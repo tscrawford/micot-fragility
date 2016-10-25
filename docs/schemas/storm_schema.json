@@ -5,6 +5,64 @@
 	"description": "A set of schema definitions for the cyclonic storms.",
 	"type": "object",
 	"properties": {
-		
+		"trackpoints": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/trackpoint"
+			}
+		}
+	},
+	"definitions": {
+		"trackpoint": {
+			"type": "object",
+			"description": "A Point in GeoJSON with named properties.",
+			"properties": {
+				"point": {
+					"type":"object",
+					"description": "The Point object for the track.",
+					"oneOf":[
+						{
+							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geometry.json","enum":["Point"]
+						}
+					]
+				},
+				"time": {
+					"type": "number",
+					"description": "The time of the observation in storm time units."
+				},
+				"vf": {
+					"type": "number",
+					"description": "The forward velocity of the storm in storm velocity units."
+				},
+				"minp": {
+					"type": "number",
+					"description": "The barometric pressure at the track point in storm pressure units."
+				},
+				"wmax": {
+					"type": "number",
+					"description": "The maximum wind speed at the track point in storm velocity units."
+				},
+				"rmax": {
+					"type": "number",
+					"description": "The radial distance of the maximum winds from the track point in storm velocity units."
+				},
+				"thetamax": {
+					"type": "number",
+					"description": "The azimuthal angle of the maximum winds relative to the track point in degrees."
+				},
+				"overland": {
+					"type": "boolean",
+					"description": "True if the track point is over land."
+				},
+				"windprofile": {
+					"type": "object",
+					"description": "A profile model object representing the wind speed."
+				},
+				"pressureprofile": {
+					"type": "object",
+					"description": "A profile model object representing the pressure field."
+				}
+			}
+		}
 	}
 }
