@@ -1,0 +1,10 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "Cyclonic Storm Model Definitions",
+	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/storm_schema.json",
+	"description": "A set of schema definitions for the cyclonic storms.",
+	"type": "object",
+	"properties": {
+		
+	}
+}
