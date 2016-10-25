@@ -1,0 +1,282 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "General Fragility Model Definitions",
+	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/GFM_schema.json",
+	"description": "A set of core schema definitions for the General Fragility Model (GFM) framework.",
+	"type": "object",
+	"properties": 
+	{
+		"assets": 
+		{
+			"type": "array",
+			"items": 
+			{
+						"$ref": "#/definitions/asset"
+			}
+		},
+		"hazardFields": 
+		{
+			"type": "array",
+			"items": 
+			{
+						"$ref": "#/definitions/hazardField"
+			}
+		},
+		"responseEstimators": 
+		{
+			"type": "array",
+			"items": 
+			{
+						"$ref": "#/definitions/responseEstimator"
+			}
+		},
+		"assetResponses": 
+		{
+			"type": "array",
+			"items": 
+			{
+						"$ref": "#/definitions/assetResponse"
+			}
+		}
+	},
+	"definitions": 
+	{
+		"assetClass": 
+		{
+			"type": "string",
+			"description": "The term used to define an asset class.",
+			"enum": 
+			[
+				"PowerDistributionLine",
+				"PowerDistributionPole",
+				"PowerTransmissionLine",
+				"PowerTransmissionTower",
+				"PowerGenerationStation",
+				"PowerGenerationUnit",
+				"PowerBus",
+				"PotableWaterPump",
+				"PotableWaterTank",
+				"PotableWaterTreatmentPlant"
+			]
+		},
+		"hazardQuantityType": 
+		{
+			"type": "string",
+			"description": "The term used to define a hazard quantity.",
+			"enum": 
+			[
+				"FloodDepth",
+				"FloodVelocity",
+				"Windspeed",
+				"BlastOverpressure",
+				"BlastDynamicPressure"
+			]
+		},
+		"responseQuantityType": 
+		{
+			"type": "string",
+			"description": "The term used to define a response quantity.",
+			"enum": 
+			[
+				"DamageProbability"
+			]
+		},
+		"responseEstimatorClass": 
+		{
+			"type": "string",
+			"enum": 
+			[
+				"PowerPoleWindStressEstimator"
+			]
+		},
+		"asset": 
+		{
+			"type": "object",
+			"description": "An asset instance in a fragility model.",
+			"required": 
+			[
+				"id",
+				"assetClass",
+				"assetGeometry",
+				"properties"
+			],
+			"additionalProperties": false,
+			"properties": 
+			{
+				"id": 
+				{
+					"type": "string",
+					"description": "The unique ID of the asset within its class."
+				},
+				"assetClass": 
+				{
+					"$ref": "#/definitions/assetClass"
+				},
+				"assetGeometry": 
+				{
+					"type": "object",
+					"description": "The geospatial geometry, in GeoJSON, of the asset used to assess its exposure to hazards.",
+					"allOf": 
+					[
+						{
+							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geojson_schema_geometry.json"
+						}
+					]
+				},
+				"properties": 
+				{
+					"type": "object",
+					"description": "The set of properties required to assess the fragility of this class of asset.",
+					"anyOf": 
+					[
+						{
+							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/GFM_pole_fragility_schema_v1.json"
+						}
+					]
+				}
+			}
+		},
+		"hazardField": 
+		{
+			"type": "object",
+			"description": "An instance of a hazard field in a fragility model.",
+			"required": 
+			[
+				"id",
+				"hazardQuantityType",
+				"rasterFieldData"
+			],
+			"additionalProperties": false,
+			"properties": 
+			{
+				"id": 
+				{
+					"type": "string"
+				},
+				"hazardQuantityType": 
+				{
+					"$ref": "#/definitions/hazardQuantityType"
+				},
+				"rasterFieldData": 
+				{
+					"title": "rasterFieldData",
+					"type": "object",
+					"required": 
+					[
+						"uri",
+						"gridFormat",
+						"crsCode",
+						"nBands",
+						"rasterBand",
+						"valueType"
+					],
+					"additionalProperties": false,
+					"properties": 
+					{
+						"uri": 
+						{
+							"type": "string"
+						},
+						"gridFormat": 
+						{
+							"type": "string"
+						},
+						"crsCode": 
+						{
+							"type": "string"
+						},
+						"nBands": 
+						{
+							"type": "number"
+						},
+						"rasterBand": 
+						{
+							"type": "number"
+						},
+						"valueType": 
+						{
+							"type": "string"
+						}
+					}
+				}
+			}
+		},
+		"responseEstimator": 
+		{
+			"type": "object",
+			"description": "An instance of response estimator - a component of a fragility model.",
+			"required": 
+			[
+				"id",
+				"responseEstimatorClass",
+				"assetClass",
+				"hazardQuantityType",
+				"responseQuantityType",
+				"properties"
+			],
+			"additionalProperties": false,
+			"properties": 
+			{
+				"id": 
+				{
+					"type": "string"
+				},
+				"responseEstimatorClass": 
+				{
+					"type": "string"
+				},
+				"assetClass": 
+				{
+					"$ref": "#/definitions/assetClass"
+				},
+				"hazardQuantityType": 
+				{
+					"$ref": "#/definitions/hazardQuantityType"
+				},
+				"responseQuantityType": 
+				{
+					"$ref": "#/definitions/responseQuantityType"
+				},
+				"properties": 
+				{
+					"type": "object",
+					"description": "The set of properties required to assess the fragility of this class of asset.",
+					"anyOf": 
+					[
+						{
+							"description": "Place response estimator property schemas here."
+						}
+					]
+				}
+			}
+		},
+		"assetResponse": 
+		{
+			"type": "object",
+			"description": "The response of an asset instance to exposure from a given hazard.",
+			"properties": 
+			{
+				"assetID": 
+				{
+					"type": "string"
+				},
+				"assetClass": 
+				{
+					"$ref": "#/definitions/assetClass"
+				},
+				"hazardQuantityType": 
+				{
+					"$ref": "#/definitions/hazardQuantityType"
+				},
+				"responseQuantityType": 
+				{
+					"$ref": "#/definitions/responseQuantityType"
+				},
+				"value": 
+				{
+					"type": "number"
+				}
+			}
+		}
+	}
+}

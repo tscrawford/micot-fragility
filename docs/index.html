@@ -1,6 +1,49 @@
 <!doctype html>
-<head></head>
+<head>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+</head>
 <body>
-<h1>Micot Fragility</h1>
+    <h1>MICOT Fragility</h1>
+    <p>
+        These pages describe the fragility modeling component of the Multiple Infrastructure Control and Optimization Toolkit (MICOT) project supported by the US Department of Energy (DOE) and the Department of Homeland Defense (DHS). Use this page to navagate to project documentation, code manuals, and data schemas.
+    </p>
+    
+    <h2>Fragility Modeling for Critical Infrastructure Protection</h2>
+    <p>
+        Protecting critical infrastructure is vital to national security. Computer models have a prominent role in analyzing threats and preparing for potential disasters, whether those threats are human-caused or natural.
+    </p>
+    <p>
+        Fragility is the general term for models that predict the immediate or primary impact of hazards, such as wind, water, blast, and so on, on critical infrastructure systems. In broad terms, these models work by first estimating the exposure of infrastructure assets to various hazards, and then estimating the response of the asset to the exposure.
+    </p>
+    <h2>The General Fragility Model</h2>
+    <p>
+        The General Fragility Model (GFM) is a framework for fragility modeling initially developed for DHS. The GFM supports the development and integration of arbitrary fragility modeling components into an overall model. Component models can be independently authored and registered with the framework based on their signature. A component’s signature is a tuple (H,A,R), where H is the set of hazard quantities (e.g. flood depth), A is the class of assets (e.g. electric power substations), and R is the set of response quantities (e.g. probability of damage) that the component will handle. The signature completely characterizes the function of a component in the overall fragility model. When used in application, the framework accepts a set of geographic raster fields for each hazard quantity, and collections of assets to be exposed to the specified hazards. It then evaluates the exposure and response of each asset to the given hazards and outputs the results. The GFM’s component-based design, along with a flexible schema for describing assets and their properties, allows the framework to accommodate any fragility model formulation.
+    </p>
+    <h3>Links</h3>
+    <ul>
+        <li>GFM Documentation</li>
+        <li>Data Schemas
+        <ul>
+            <li>GFM Schemas
+                <ul>
+                    <li>
+                        <a href="schemas/GFM_schema.json">Core GFM JSON Schema</a>
+                    </li>
+                    <li>
+                        <a href="schemas/GFM_pole_fragility_schema_v1.json">Schema for the GFM Pole Fragility Model Version 1.0</a>
+                    </li>
+                </ul>
+            <li>Other Schemas
+                <ul>
+                    <li>
+                        <a href="schemas/geojson_schema_geometry.json">GeoJSON Geometry Schema</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+        </li>
+    </ul>
+    
+    
+    
 </body>
-</html>
