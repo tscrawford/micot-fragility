@@ -5,27 +5,32 @@
 	"description": "A set of schema definitions for the cyclonic storms.",
 	"type": "object",
 	"properties": {
-		"trackpoints": {
+		"type":{
+			"type":"string","enum": ["FeatureCollection"]
+		},
+		"features": {
 			"type": "array",
 			"items": {
-				"$ref": "#/definitions/trackpoint"
+				"$ref": "#/definitions/trackpointFeature"
 			}
 		}
 	},
 	"definitions": {
-		"trackpoint": {
+		"trackpointGeometry": {
 			"type": "object",
-			"description": "A Point in GeoJSON with named properties.",
-			"properties": {
-				"point": {
-					"type":"object",
-					"description": "The Point object for the track.",
-					"oneOf":[
+					"oneOf": [
 						{
-							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geometry.json","enum":["Point"]
+							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geometry.json",
+							"enum": [
+								"Point"
+							]
 						}
 					]
-				},
+		},
+		"trackpointProperties": {
+			"type": "object",
+			"description": "Named properties for a track point.",
+			"properties": {
 				"time": {
 					"type": "number",
 					"description": "The time of the observation in storm time units."
@@ -34,19 +39,19 @@
 					"type": "number",
 					"description": "The forward velocity of the storm in storm velocity units."
 				},
-				"minp": {
+				"minP": {
 					"type": "number",
 					"description": "The barometric pressure at the track point in storm pressure units."
 				},
-				"wmax": {
+				"wMax": {
 					"type": "number",
 					"description": "The maximum wind speed at the track point in storm velocity units."
 				},
-				"rmax": {
+				"rMax": {
 					"type": "number",
 					"description": "The radial distance of the maximum winds from the track point in storm velocity units."
 				},
-				"thetamax": {
+				"thetaMax": {
 					"type": "number",
 					"description": "The azimuthal angle of the maximum winds relative to the track point in degrees."
 				},
@@ -54,13 +59,39 @@
 					"type": "boolean",
 					"description": "True if the track point is over land."
 				},
-				"windprofile": {
+				"windProfile": {
 					"type": "object",
 					"description": "A profile model object representing the wind speed."
 				},
-				"pressureprofile": {
+				"pressureProfile": {
 					"type": "object",
 					"description": "A profile model object representing the pressure field."
+				}
+			}
+		},
+		"trackpointFeature": {
+			"type": "object",
+			"description": "Specialized GeoJSON Feature for track points.",
+			"required": [
+				"geometry",
+				"properties"
+			],
+			"properties": {
+				"geometry": {
+					"type": "object",
+					"oneOf": [
+						{
+							"$ref": "#definitions/trackpointGeometry"
+						}
+					]
+				},
+				"properties": {
+					"type": "object",
+					"oneOf": [
+						{
+							"$ref": "#definitions/trackpointProperties"
+						}
+					]
 				}
 			}
 		}

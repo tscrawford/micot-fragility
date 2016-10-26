@@ -1,0 +1,45 @@
+{
+	"type": "FeatureCollection",
+	"features": [
+		{
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					1.1,
+					1.1
+				]
+			},
+			"properties": {
+				"time": 1.1,
+				"vf": 1.1,
+				"minP": 1.1,
+				"wMax": 1.1,
+				"rMax": 1.1,
+				"thetaMax": 1.1,
+				"overland": true,
+				"windProfile": {},
+				"pressureProfile": {}
+			}
+		},
+		{
+			"geometry": {
+				"type": "Point",
+				"coordinates": [
+					1.1,
+					1.1
+				]
+			},
+			"properties": {
+				"time": 1.1,
+				"vf": 1.1,
+				"minP": 1.1,
+				"wMax": 1.1,
+				"rMax": 1.1,
+				"thetaMax": 1.1,
+				"overland": true,
+				"windProfile": {},
+				"pressureProfile": {}
+			}
+		}
+	]
+}
