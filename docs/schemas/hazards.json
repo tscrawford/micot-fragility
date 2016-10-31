@@ -1,0 +1,61 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"title": "General Fragility Model Definitions",
+	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/GFM_schema.json",
+	"description": "A set of core schema definitions for the General Fragility Model (GFM) framework.",
+	"type": "object",
+	"properties": {},
+	"definitions": {
+		"hazardField": {
+			"type": "object",
+			"description": "An instance of a hazard field in a fragility model.",
+			"required": [
+				"id",
+				"hazardQuantityType",
+				"rasterFieldData"
+			],
+			"additionalProperties": false,
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"hazardQuantityType": {
+					"$ref": "#/definitions/hazardQuantityType"
+				},
+				"rasterFieldData": {
+					"title": "rasterFieldData",
+					"type": "object",
+					"required": [
+						"uri",
+						"gridFormat",
+						"crsCode",
+						"nBands",
+						"rasterBand",
+						"valueType"
+					],
+					"additionalProperties": false,
+					"properties": {
+						"uri": {
+							"type": "string"
+						},
+						"gridFormat": {
+							"type": "string"
+						},
+						"crsCode": {
+							"type": "string"
+						},
+						"nBands": {
+							"type": "number"
+						},
+						"rasterBand": {
+							"type": "number"
+						},
+						"valueType": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+}
