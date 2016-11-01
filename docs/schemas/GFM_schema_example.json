@@ -4,8 +4,11 @@
 			"id": "a",
 			"assetClass": "PowerDistributionLine",
 			"assetGeometry": {
-				"type": "a",
-				"coordinates": "a"
+				"type": "Point",
+				"coordinates": [
+					1.1,
+					1.1
+				]
 			},
 			"properties": {
 				"height": 1.1,
@@ -30,8 +33,11 @@
 			"id": "a",
 			"assetClass": "PowerDistributionLine",
 			"assetGeometry": {
-				"type": "a",
-				"coordinates": "a"
+				"type": "Point",
+				"coordinates": [
+					1.1,
+					1.1
+				]
 			},
 			"properties": {
 				"height": 1.1,
