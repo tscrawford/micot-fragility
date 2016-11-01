@@ -1,0 +1,79 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json",
+	"title": "General Fragility Model Definitions",
+	"description": "A schema describing hazard fields.",
+	"type": "object",
+	"properties": {
+		"hazardFields": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/hazardField"
+			}
+		}
+	},
+	"definitions": {
+		"hazardQuantityType": {
+			"description": "The term used to define a hazard quantity.",
+			"type": "string",
+			"enum": [
+				"FloodDepth",
+				"FloodVelocity",
+				"Windspeed",
+				"BlastOverpressure",
+				"BlastDynamicPressure"
+			]
+		},
+		"hazardField": {
+			"description": "An instance of a hazard field in a fragility model.",
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"hazardQuantityType": {
+					"$ref": "#/definitions/hazardQuantityType"
+				},
+				"rasterFieldData": {
+					"title": "rasterFieldData",
+					"type": "object",
+					"properties": {
+						"uri": {
+							"type": "string"
+						},
+						"gridFormat": {
+							"type": "string"
+						},
+						"crsCode": {
+							"type": "string"
+						},
+						"nBands": {
+							"type": "number"
+						},
+						"rasterBand": {
+							"type": "number"
+						},
+						"valueType": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"uri",
+						"gridFormat",
+						"crsCode",
+						"nBands",
+						"rasterBand",
+						"valueType"
+					],
+					"additionalProperties": false
+				}
+			},
+			"required": [
+				"id",
+				"hazardQuantityType",
+				"rasterFieldData"
+			],
+			"additionalProperties": false
+		}
+	}
+}

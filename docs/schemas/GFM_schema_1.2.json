@@ -1,0 +1,162 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/GFM_schema.json",
+	"title": "General Fragility Model Definitions",
+	"description": "A set of core schema definitions for the General Fragility Model (GFM) framework.",
+	"type": "object",
+	"properties": {
+		"assets": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/asset"
+			}
+		},
+		"hazardFields": {
+			"type": "array",
+			"items": {
+				"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json/#/definitions/hazardField"
+			}
+		},
+		"responseEstimators": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/responseEstimator"
+			}
+		},
+		"assetResponses": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/assetResponse"
+			}
+		}
+	},
+	"definitions": {
+		"assetClass": {
+			"description": "The term used to define an asset class.",
+			"type": "string",
+			"enum": [
+				"PowerDistributionLine",
+				"PowerDistributionPole",
+				"PowerTransmissionLine",
+				"PowerTransmissionTower",
+				"PowerGenerationStation",
+				"PowerGenerationUnit",
+				"PowerBus",
+				"PotableWaterPump",
+				"PotableWaterTank",
+				"PotableWaterTreatmentPlant"
+			]
+		},
+		"responseQuantityType": {
+			"description": "The term used to define a response quantity.",
+			"type": "string",
+			"enum": [
+				"DamageProbability"
+			]
+		},
+		"responseEstimatorClass": {
+			"type": "string",
+			"enum": [
+				"PowerPoleWindStressEstimator"
+			]
+		},
+		"asset": {
+			"description": "An asset instance in a fragility model.",
+			"type": "object",
+			"properties": {
+				"id": {
+					"description": "The unique ID of the asset within its class.",
+					"type": "string"
+				},
+				"assetClass": {
+					"$ref": "#/definitions/assetClass"
+				},
+				"assetGeometry": {
+					"description": "The geospatial geometry, in GeoJSON, of the asset used to assess its exposure to hazards.",
+					"type": "object",
+					"allOf": [
+						{
+							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geometry.json"
+						}
+					]
+				},
+				"properties": {
+					"description": "The set of properties required to assess the fragility of this class of asset.",
+					"type": "object",
+					"anyOf": [
+						{
+							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/GFM_pole_fragility_schema_v1.json"
+						}
+					]
+				}
+			},
+			"required": [
+				"id",
+				"assetClass",
+				"assetGeometry",
+				"properties"
+			],
+			"additionalProperties": false
+		},
+		"responseEstimator": {
+			"description": "An instance of response estimator - a component of a fragility model.",
+			"type": "object",
+			"properties": {
+				"id": {
+					"type": "string"
+				},
+				"responseEstimatorClass": {
+					"type": "string"
+				},
+				"assetClass": {
+					"$ref": "#/definitions/assetClass"
+				},
+				"hazardQuantityType": {
+					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json/#/definitions/hazardQuantityType"
+				},
+				"responseQuantityType": {
+					"$ref": "#/definitions/responseQuantityType"
+				},
+				"properties": {
+					"description": "The set of properties required to assess the fragility of this class of asset.",
+					"type": "object",
+					"anyOf": [
+						{
+							"description": "Place response estimator property schemas here."
+						}
+					]
+				}
+			},
+			"required": [
+				"id",
+				"responseEstimatorClass",
+				"assetClass",
+				"hazardQuantityType",
+				"responseQuantityType",
+				"properties"
+			],
+			"additionalProperties": false
+		},
+		"assetResponse": {
+			"description": "The response of an asset instance to exposure from a given hazard.",
+			"type": "object",
+			"properties": {
+				"assetID": {
+					"type": "string"
+				},
+				"assetClass": {
+					"$ref": "#/definitions/assetClass"
+				},
+				"hazardQuantityType": {
+					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json/#/definitions/hazardQuantityType"
+				},
+				"responseQuantityType": {
+					"$ref": "#/definitions/responseQuantityType"
+				},
+				"value": {
+					"type": "number"
+				}
+			}
+		}
+	}
+}
