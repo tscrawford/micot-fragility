@@ -1,0 +1,114 @@
+{
+	"assets": [
+		{
+			"id": "a",
+			"assetClass": "PowerDistributionLine",
+			"assetGeometry": {
+				"type": "a",
+				"coordinates": "a"
+			},
+			"properties": {
+				"height": 1.1,
+				"baseDiameter": 1.1,
+				"topDiameter": 1.1,
+				"cableSpan": 1.1,
+				"woodDensity": 1.1,
+				"meanPoleStrength": 1.1,
+				"stdDevPoleStrength": 1.1,
+				"powerCableDiameter": 1.1,
+				"powerCableNumber": 1.1,
+				"powerCableWireDensity": 1.1,
+				"powerCircuitName": "a",
+				"powerAttachmentHeight": 1.1,
+				"commCableNumber": 1.1,
+				"commCableDiameter": 1.1,
+				"commCableWireDensity": 1.1,
+				"commAttachmentHeight": 1.1
+			}
+		},
+		{
+			"id": "a",
+			"assetClass": "PowerDistributionLine",
+			"assetGeometry": {
+				"type": "a",
+				"coordinates": "a"
+			},
+			"properties": {
+				"height": 1.1,
+				"baseDiameter": 1.1,
+				"topDiameter": 1.1,
+				"cableSpan": 1.1,
+				"woodDensity": 1.1,
+				"meanPoleStrength": 1.1,
+				"stdDevPoleStrength": 1.1,
+				"powerCableDiameter": 1.1,
+				"powerCableNumber": 1.1,
+				"powerCableWireDensity": 1.1,
+				"powerCircuitName": "a",
+				"powerAttachmentHeight": 1.1,
+				"commCableNumber": 1.1,
+				"commCableDiameter": 1.1,
+				"commCableWireDensity": 1.1,
+				"commAttachmentHeight": 1.1
+			}
+		}
+	],
+	"hazardFields": [
+		{
+			"hazardFields": [
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				},
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				}
+			]
+		},
+		{
+			"hazardFields": [
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				},
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				}
+			]
+		}
+	]
+}

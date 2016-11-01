@@ -14,19 +14,23 @@
 		"hazardFields": {
 			"type": "array",
 			"items": {
-				"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json/#/definitions/hazardField"
-			}
-		},
-		"responseEstimators": {
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/responseEstimator"
-			}
-		},
-		"assetResponses": {
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/assetResponse"
+				"allOf": [
+					{
+						"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json"
+					}
+				]
+			},
+			"responseEstimators": {
+				"type": "array",
+				"items": {
+					"$ref": "#/definitions/responseEstimator"
+				}
+			},
+			"assetResponses": {
+				"type": "array",
+				"items": {
+					"$ref": "#/definitions/assetResponse"
+				}
 			}
 		}
 	},
