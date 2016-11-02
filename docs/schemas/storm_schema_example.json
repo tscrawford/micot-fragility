@@ -1,45 +1,111 @@
 {
-	"type": "FeatureCollection",
-	"features": [
-		{
-			"geometry": {
-				"type": "Point",
-				"coordinates": [
-					1.1,
-					1.1
-				]
+	"stormId": "a",
+	"name": "a",
+	"description": "a",
+	"timeUnits": "days",
+	"distanceUnits": "km",
+	"windspeedUnits": "mph",
+	"pressureUnits": "Pa",
+	"initialTime": "a",
+	"stormTrack": {
+		"type": "FeatureCollection",
+		"features": [
+			{
+				"geometry": {
+					"type": "Point",
+					"coordinates": [
+						1.1,
+						1.1
+					]
+				},
+				"properties": {
+					"time": 1.1,
+					"vf": 1.1,
+					"minP": 1.1,
+					"wMax": 1.1,
+					"rMax": 1.1,
+					"thetaMax": 1.1,
+					"overland": true,
+					"windProfile": {
+						"coordinateSystem": "cartesian",
+						"samplePoints": [
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							},
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							}
+						]
+					},
+					"pressureProfile": {
+						"coordinateSystem": "cartesian",
+						"samplePoints": [
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							},
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							}
+						]
+					}
+				}
 			},
-			"properties": {
-				"time": 1.1,
-				"vf": 1.1,
-				"minP": 1.1,
-				"wMax": 1.1,
-				"rMax": 1.1,
-				"thetaMax": 1.1,
-				"overland": true,
-				"windProfile": {},
-				"pressureProfile": {}
+			{
+				"geometry": {
+					"type": "Point",
+					"coordinates": [
+						1.1,
+						1.1
+					]
+				},
+				"properties": {
+					"time": 1.1,
+					"vf": 1.1,
+					"minP": 1.1,
+					"wMax": 1.1,
+					"rMax": 1.1,
+					"thetaMax": 1.1,
+					"overland": true,
+					"windProfile": {
+						"coordinateSystem": "cartesian",
+						"samplePoints": [
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							},
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							}
+						]
+					},
+					"pressureProfile": {
+						"coordinateSystem": "cartesian",
+						"samplePoints": [
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							},
+							{
+								"x": 1.1,
+								"y": 1.1,
+								"value": 1.1
+							}
+						]
+					}
+				}
 			}
-		},
-		{
-			"geometry": {
-				"type": "Point",
-				"coordinates": [
-					1.1,
-					1.1
-				]
-			},
-			"properties": {
-				"time": 1.1,
-				"vf": 1.1,
-				"minP": 1.1,
-				"wMax": 1.1,
-				"rMax": 1.1,
-				"thetaMax": 1.1,
-				"overland": true,
-				"windProfile": {},
-				"pressureProfile": {}
-			}
-		}
-	]
+		]
+	}
 }

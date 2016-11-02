@@ -1,31 +1,148 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"title": "Cyclonic Storm Model Definitions",
+	"title": "Cyclonic Storm Track Definitions",
 	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/storm_schema.json",
-	"description": "A set of schema definitions for the cyclonic storms.",
+	"description": "A set of schema definitions for the track and properties of a cyclonic storm.",
 	"type": "object",
 	"properties": {
-		"type":{
-			"type":"string","enum": ["FeatureCollection"]
+		"stormId": {
+			"type": "string",
+			"description": "A unique identifier for the storm track"
 		},
-		"features": {
-			"type": "array",
-			"items": {
-				"$ref": "#/definitions/trackpointFeature"
-			}
+		"name": {
+			"type": "string",
+			"description": "An optional name for the storm"
+		},
+		"description": {
+			"type": "string",
+			"description": "An optional description for the storm"
+		},
+		"timeUnits": {
+			"$ref": "#/definitions/timeUnits"
+		},
+		"distanceUnits": {
+			"$ref": "#/definitions/distanceUnits"
+		},
+		"windspeedUnits": {
+			"$ref": "#/definitions/windspeedUnits"
+		},
+		"pressureUnits": {
+			"$ref": "#/definitions/pressureUnits"
+		},
+		"initialTime": {
+			"type": "string",
+			"description": "The initial time from which all times are referenced",
+			"format": "date-time"
+		},
+		"stormTrack": {
+			"$ref": "#/definitions/stormTrack"
 		}
 	},
 	"definitions": {
+		"timeUnits": {
+			"type": "string",
+			"description": "Units for time",
+			"enum": [
+				"days",
+				"hours",
+				"minutes",
+				"seconds"
+			]
+		},
+		"distanceUnits": {
+			"type": "string",
+			"description": "Units for distance",
+			"enum": [
+				"km",
+				"n.m.",
+				"miles"
+			]
+		},
+		"windspeedUnits": {
+			"type": "string",
+			"description": "Units for windspeed",
+			"enum": [
+				"mph",
+				"knots"
+			]
+		},
+		"pressureUnits": {
+			"type": "string",
+			"description": "Units for atmospheric pressure",
+			"enum": [
+				"Pa",
+				"mb"
+			]
+		},
+		"stormTrack": {
+			"type": "object",
+			"properties": {
+				"type": {
+					"type": "string",
+					"enum": [
+						"FeatureCollection"
+					]
+				},
+				"features": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/trackpointFeature"
+					}
+				}
+			}
+		},
 		"trackpointGeometry": {
 			"type": "object",
-					"oneOf": [
-						{
-							"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geometry.json",
-							"enum": [
-								"Point"
-							]
-						}
+			"oneOf": [
+				{
+					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/geometry.json",
+					"enum": [
+						"Point"
 					]
+				}
+			]
+		},
+		"coordinateSystem2D": {
+			"type": "string",
+			"description": "A 2D coordinate system label",
+			"enum": [
+				"cartesian",
+				"geospatial",
+				"polar"
+			]
+		},
+		"samplePoint2D": {
+			"type": "object",
+			"description": "A sample point on a two-dimensional plane",
+			"properties": {
+				"x": {
+					"type": "number",
+					"description": "First coordinate"
+				},
+				"y": {
+					"type": "number",
+					"description": "Second coordinate"
+				},
+				"value": {
+					"type": "number",
+					"description": "Sampled value at the point"
+				}
+			}
+		},
+		"sampledProfile": {
+			"type": "object",
+			"description": "A sequence of numerical values sampled on a two-dimensional coordinate system",
+			"properties": {
+				"coordinateSystem": {
+					"$ref": "#/definitions/coordinateSystem2D"
+				},
+				"samplePoints": {
+					"type": "array",
+					"items": {
+						"$ref": "#definitions/samplePoint2D"
+					}
+				}
+			}
 		},
 		"trackpointProperties": {
 			"type": "object",
@@ -61,11 +178,21 @@
 				},
 				"windProfile": {
 					"type": "object",
-					"description": "A profile model object representing the wind speed."
+					"description": "A profile model object representing the wind speed.",
+					"oneOf": [
+						{
+							"$ref": "#/definitions/sampledProfile"
+						}
+					]
 				},
 				"pressureProfile": {
 					"type": "object",
-					"description": "A profile model object representing the pressure field."
+					"description": "A profile model object representing the pressure field.",
+					"oneOf": [
+						{
+							"$ref": "#/definitions/sampledProfile"
+						}
+					]
 				}
 			}
 		},
@@ -81,7 +208,7 @@
 					"type": "object",
 					"oneOf": [
 						{
-							"$ref": "#definitions/trackpointGeometry"
+							"$ref": "#/definitions/trackpointGeometry"
 						}
 					]
 				},
@@ -89,7 +216,7 @@
 					"type": "object",
 					"oneOf": [
 						{
-							"$ref": "#definitions/trackpointProperties"
+							"$ref": "#/definitions/trackpointProperties"
 						}
 					]
 				}
