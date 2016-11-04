@@ -1,7 +1,7 @@
 {
 	"$schema": "http://json-schema.org/draft-04/schema#",
-	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/GFM_schema.json",
-	"title": "General Fragility Model Definitions",
+	"id": "https://lanl-ansi.github.io/micot-fragility/schemas/GFM_schema_1.2.json",
+	"title": "General Fragility Model Definitions: Version 1.2",
 	"description": "A set of core schema definitions for the General Fragility Model (GFM) framework.",
 	"type": "object",
 	"properties": {
@@ -19,18 +19,18 @@
 						"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json"
 					}
 				]
-			},
-			"responseEstimators": {
-				"type": "array",
-				"items": {
-					"$ref": "#/definitions/responseEstimator"
-				}
-			},
-			"assetResponses": {
-				"type": "array",
-				"items": {
-					"$ref": "#/definitions/assetResponse"
-				}
+			}
+		},
+		"responseEstimators": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/responseEstimator"
+			}
+		},
+		"assetResponses": {
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/assetResponse"
 			}
 		}
 	},
@@ -116,7 +116,7 @@
 					"$ref": "#/definitions/assetClass"
 				},
 				"hazardQuantityType": {
-					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json/#/definitions/hazardQuantityType"
+					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardQuantityType"
 				},
 				"responseQuantityType": {
 					"$ref": "#/definitions/responseQuantityType"
@@ -152,7 +152,7 @@
 					"$ref": "#/definitions/assetClass"
 				},
 				"hazardQuantityType": {
-					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json/#/definitions/hazardQuantityType"
+					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardQuantityType"
 				},
 				"responseQuantityType": {
 					"$ref": "#/definitions/responseQuantityType"

@@ -53,8 +53,8 @@
 			"type": "string",
 			"description": "Units for distance",
 			"enum": [
-				"km",
-				"n.m.",
+				"kilometers",
+				"nautical_miles",
 				"miles"
 			]
 		},
@@ -129,7 +129,7 @@
 				}
 			}
 		},
-		"sampledProfile": {
+		"sampledData": {
 			"type": "object",
 			"description": "A sequence of numerical values sampled on a two-dimensional coordinate system",
 			"properties": {
@@ -139,7 +139,7 @@
 				"samplePoints": {
 					"type": "array",
 					"items": {
-						"$ref": "#definitions/samplePoint2D"
+						"$ref": "#/definitions/samplePoint2D"
 					}
 				}
 			}
@@ -176,21 +176,21 @@
 					"type": "boolean",
 					"description": "True if the track point is over land."
 				},
-				"windProfile": {
+				"windData": {
 					"type": "object",
 					"description": "A profile model object representing the wind speed.",
 					"oneOf": [
 						{
-							"$ref": "#/definitions/sampledProfile"
+							"$ref": "#/definitions/sampledData"
 						}
 					]
 				},
-				"pressureProfile": {
+				"pressureData": {
 					"type": "object",
 					"description": "A profile model object representing the pressure field.",
 					"oneOf": [
 						{
-							"$ref": "#/definitions/sampledProfile"
+							"$ref": "#/definitions/sampledData"
 						}
 					]
 				}

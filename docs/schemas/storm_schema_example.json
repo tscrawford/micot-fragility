@@ -3,7 +3,7 @@
 	"name": "a",
 	"description": "a",
 	"timeUnits": "days",
-	"distanceUnits": "km",
+	"distanceUnits": "kilometers",
 	"windspeedUnits": "mph",
 	"pressureUnits": "Pa",
 	"initialTime": "a",
@@ -26,7 +26,7 @@
 					"rMax": 1.1,
 					"thetaMax": 1.1,
 					"overland": true,
-					"windProfile": {
+					"windData": {
 						"coordinateSystem": "cartesian",
 						"samplePoints": [
 							{
@@ -41,7 +41,7 @@
 							}
 						]
 					},
-					"pressureProfile": {
+					"pressureData": {
 						"coordinateSystem": "cartesian",
 						"samplePoints": [
 							{
@@ -74,7 +74,7 @@
 					"rMax": 1.1,
 					"thetaMax": 1.1,
 					"overland": true,
-					"windProfile": {
+					"windData": {
 						"coordinateSystem": "cartesian",
 						"samplePoints": [
 							{
@@ -89,7 +89,7 @@
 							}
 						]
 					},
-					"pressureProfile": {
+					"pressureData": {
 						"coordinateSystem": "cartesian",
 						"samplePoints": [
 							{
