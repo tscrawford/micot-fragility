@@ -82,7 +82,7 @@ public class Fragility {
 		// Usage is:
 		//     SimpleFragilityEngine inputFile outputFile <-schema schemaURL>
 		if(args.length<2){
-			System.err.println("Usage is SimpleFragilityEngine inputFile outputFile <-schema schemaURL>");
+			System.err.println("Usage is Fragility inputFile outputFile <-schema schemaURL>");
 			System.exit(1);
 		}
 
