@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>gov.lanl.micot.fragility</groupId>
-	<artifactId>Fragility</artifactId>
+	<artifactId>GFMFragility</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
 
