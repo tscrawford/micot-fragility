@@ -14,11 +14,7 @@
 		"hazardFields": {
 			"type": "array",
 			"items": {
-				"allOf": [
-					{
-						"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json"
-					}
-				]
+						"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardField"
 			}
 		},
 		"responseEstimators": {

@@ -42,7 +42,11 @@
 							"type": "string"
 						},
 						"gridFormat": {
-							"type": "string"
+							"type": "string",
+                            enum:[
+                                "GeoTiff",
+                                "ArcGrid"
+                            ]
 						},
 						"crsCode": {
 							"type": "string"
