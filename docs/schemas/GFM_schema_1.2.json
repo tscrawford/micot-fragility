@@ -14,7 +14,7 @@
 		"hazardFields": {
 			"type": "array",
 			"items": {
-						"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardField"
+				"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardField"
 			}
 		},
 		"responseEstimators": {
@@ -41,6 +41,7 @@
 				"PowerTransmissionTower",
 				"PowerGenerationStation",
 				"PowerGenerationUnit",
+				"PowerTransmissionSubstation",
 				"PowerBus",
 				"PotableWaterPump",
 				"PotableWaterTank",
