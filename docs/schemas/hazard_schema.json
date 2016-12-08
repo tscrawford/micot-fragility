@@ -58,7 +58,8 @@
 							"type": "number"
 						},
 						"valueType": {
-							"type": "string"
+							"type": "string",
+							"enum": ["double","float","integer"]
 						}
 					},
 					"required": [

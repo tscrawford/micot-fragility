@@ -58,29 +58,28 @@
 		}
 	],
 	"hazardFields": [
-		{
-			"hazardFields": [
 				{
 					"id": "CapeMayMaxWindsAugust2017",
 					"hazardQuantityType": "Windspeed",
 					"rasterFieldData": {
-						"uri": "a",
+						"uri": "file:///C:/Users/119751/git/micot-fragility/src/test/resources/windspeedArcTestGrid.asc",
 						"gridFormat": "ArcGrid",
-						"crsCode": "a",
+						"crsCode": "EPSG:4326",
 						"nBands": 1,
 						"rasterBand": 1,
 						"valueType": "double"
 					}
-				},
+				}
 	],
 	"responseEstimators": [
 		{
 			"id": "1234",
 			"responseEstimatorClass": "PowerPoleWindStressEstimator",
 			"assetClass": "PowerDistributionPole",
-			"hazardQuantityType": "Windspeed",
+			"hazardQuantityTypes": ["Windspeed"],
 			"responseQuantityType": "DamageProbability",
 			"properties": {}
 		}
 	]
+
 }

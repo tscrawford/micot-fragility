@@ -25,7 +25,13 @@
 					<archive>
 						<manifest>
 							<mainClass>gov.lanl.micot.fragility.Fragility</mainClass>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
 						</manifest>
+						<manifestEntries>
+							<Specification-Vendor>LANL</Specification-Vendor>
+							<Implementation-Vendor>LANL</Implementation-Vendor>
+						</manifestEntries>
 					</archive>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>

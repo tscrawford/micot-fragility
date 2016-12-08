@@ -112,8 +112,11 @@
 				"assetClass": {
 					"$ref": "#/definitions/assetClass"
 				},
-				"hazardQuantityType": {
-					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardQuantityType"
+				"hazardQuantityTypes": {
+					"type": "array",
+					"items": {
+						"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardQuantityType"
+					}
 				},
 				"responseQuantityType": {
 					"$ref": "#/definitions/responseQuantityType"
@@ -132,7 +135,7 @@
 				"id",
 				"responseEstimatorClass",
 				"assetClass",
-				"hazardQuantityType",
+				"hazardQuantityTypes",
 				"responseQuantityType",
 				"properties"
 			],
@@ -148,8 +151,11 @@
 				"assetClass": {
 					"$ref": "#/definitions/assetClass"
 				},
-				"hazardQuantityType": {
-					"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardQuantityType"
+				"hazardQuantityTypes": {
+					"type": "array",
+					"items": {
+						"$ref": "https://lanl-ansi.github.io/micot-fragility/schemas/hazard_schema.json#/definitions/hazardQuantityType"
+					}
 				},
 				"responseQuantityType": {
 					"$ref": "#/definitions/responseQuantityType"
