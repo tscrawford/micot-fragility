@@ -122,6 +122,8 @@ public class Fragility {
 				if(!report.isSuccess()){
 					System.out.println(report);
 				}
+				// Reset input stream for reading.
+				instream = new FileInputStream(inputfile);
 			}
 
 			JsonNode root = readJSONInput(instream);
@@ -142,6 +144,8 @@ public class Fragility {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
