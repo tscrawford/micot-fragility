@@ -5,7 +5,10 @@
 			"assetClass": "PowerDistributionLine",
 			"assetGeometry": {
 				"type": "Point",
-				"coordinates": [1.1,1.1]
+				"coordinates": [
+					1.1,
+					1.1
+				]
 			},
 			"properties": {
 				"height": 1.1,
@@ -31,7 +34,10 @@
 			"assetClass": "PowerDistributionLine",
 			"assetGeometry": {
 				"type": "Point",
-				"coordinates": [1.1,1.1]
+				"coordinates": [
+					1.1,
+					1.1
+				]
 			},
 			"properties": {
 				"height": 1.1,
@@ -55,62 +61,60 @@
 	],
 	"hazardFields": [
 		{
-			"id": "a",
-			"hazardQuantityType": "FloodDepth",
-			"rasterFieldData": {
-				"uri": "a",
-				"gridFormat": "a",
-				"crsCode": "a",
-				"nBands": 1.1,
-				"rasterBand": 1.1,
-				"valueType": "a"
-			}
+			"hazardFields": [
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				},
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				}
+			]
 		},
 		{
-			"id": "a",
-			"hazardQuantityType": "FloodDepth",
-			"rasterFieldData": {
-				"uri": "a",
-				"gridFormat": "a",
-				"crsCode": "a",
-				"nBands": 1.1,
-				"rasterBand": 1.1,
-				"valueType": "a"
-			}
-		}
-	],
-	"responseEstimators": [
-		{
-			"id": "a",
-			"responseEstimatorClass": "a",
-			"assetClass": "PowerDistributionLine",
-			"hazardQuantityType": "FloodDepth",
-			"responseQuantityType": "DamageProbability",
-			"properties": {}
-		},
-		{
-			"id": "a",
-			"responseEstimatorClass": "a",
-			"assetClass": "PowerDistributionLine",
-			"hazardQuantityType": "FloodDepth",
-			"responseQuantityType": "DamageProbability",
-			"properties": {}
-		}
-	],
-	"assetResponses": [
-		{
-			"assetID": "a",
-			"assetClass": "PowerDistributionLine",
-			"hazardQuantityType": "FloodDepth",
-			"responseQuantityType": "DamageProbability",
-			"value": 1.1
-		},
-		{
-			"assetID": "a",
-			"assetClass": "PowerDistributionLine",
-			"hazardQuantityType": "FloodDepth",
-			"responseQuantityType": "DamageProbability",
-			"value": 1.1
+			"hazardFields": [
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				},
+				{
+					"id": "a",
+					"hazardQuantityType": "FloodDepth",
+					"rasterFieldData": {
+						"uri": "a",
+						"gridFormat": "a",
+						"crsCode": "a",
+						"nBands": 1.1,
+						"rasterBand": 1.1,
+						"valueType": "a"
+					}
+				}
+			]
 		}
 	]
 }
