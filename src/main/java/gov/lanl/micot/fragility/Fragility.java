@@ -12,7 +12,6 @@ import gov.lanl.nisac.fragility.exposure.IExposure;
 import gov.lanl.nisac.fragility.exposure.IExposureEvaluator;
 import gov.lanl.nisac.fragility.exposure.PointExposureEvaluator;
 import gov.lanl.nisac.fragility.gis.IFeature;
-import gov.lanl.nisac.fragility.gis.IFeatureCollection;
 import gov.lanl.nisac.fragility.gis.RasterField;
 import gov.lanl.nisac.fragility.hazards.HazardField;
 import gov.lanl.nisac.fragility.hazards.IHazardField;
@@ -38,17 +37,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;

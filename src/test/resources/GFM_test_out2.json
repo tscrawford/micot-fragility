@@ -1,0 +1,11 @@
+[ {
+  "assetID" : "pdp1234",
+  "assetClass" : "PowerDistributionPole",
+  "hazardQuantityType" : "Windspeed",
+  "value" : 130.0
+}, {
+  "assetID" : "pdp5678",
+  "assetClass" : "PowerDistributionPole",
+  "hazardQuantityType" : "Windspeed",
+  "value" : 130.0
+} ]

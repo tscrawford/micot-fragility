@@ -1,0 +1,13 @@
+[ {
+  "assetID" : "pdp1234",
+  "assetClass" : "PowerDistributionPole",
+  "hazardQuantityType" : "Windspeed",
+  "responseQuantityType" : "DamageProbability",
+  "value" : 0.04576955673440508
+}, {
+  "assetID" : "pdp5678",
+  "assetClass" : "PowerDistributionPole",
+  "hazardQuantityType" : "Windspeed",
+  "responseQuantityType" : "DamageProbability",
+  "value" : 0.04576955673440508
+} ]
