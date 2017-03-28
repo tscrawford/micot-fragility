@@ -62,7 +62,7 @@
 					"id": "CapeMayMaxWindsAugust2017",
 					"hazardQuantityType": "Windspeed",
 					"rasterFieldData": {
-						"uri": "file:///C:/Users/119751/git/micot-fragility/src/test/resources/windspeedArcTestGrid.asc",
+						"uri": "file:///home/ambro/git/micot-fragility/src/test/resources/windspeedArcTestGrid.asc",
 						"gridFormat": "ArcGrid",
 						"crsCode": "EPSG:4326",
 						"nBands": 1,

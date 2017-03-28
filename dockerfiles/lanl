@@ -1,0 +1,17 @@
+FROM maven:3-jdk-8
+MAINTAINER John Ambrosiano <ambro@lanl.gov>
+
+#ENV http_proxy "http://proxyout.lanl.gov:8080"
+#ENV https_proxy "http://proxyout.lanl.gov:8080"
+#RUN echo 'Acquire::http::proxy "http://proxyout.lanl.gov:8080";' > /etc/apt/apt.conf
+
+RUN mkdir /fragility
+WORKDIR /fragility
+COPY pom.xml .
+COPY src/ src/
+COPY settings.xml $MAVEN_CONFIG/
+RUN mvn install
+
+ENTRYPOINT ["java","-jar","target/Fragility.jar"]
+CMD ["--help"]
+
