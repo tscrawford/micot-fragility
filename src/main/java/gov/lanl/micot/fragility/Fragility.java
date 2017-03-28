@@ -1,15 +1,24 @@
 package gov.lanl.micot.fragility;
 
 import gov.lanl.nisac.fragility.assets.IAsset;
+import gov.lanl.nisac.fragility.core.IProperty;
 import gov.lanl.nisac.fragility.core.Properties;
 import gov.lanl.nisac.fragility.core.Property;
+import gov.lanl.nisac.fragility.engine.DefaultExposureEngine;
 import gov.lanl.nisac.fragility.engine.DefaultFragilityEngine;
 import gov.lanl.nisac.fragility.engine.FragilityEngine;
+import gov.lanl.nisac.fragility.engine.IExposureEngine;
+import gov.lanl.nisac.fragility.exposure.IExposure;
+import gov.lanl.nisac.fragility.exposure.IExposureEvaluator;
+import gov.lanl.nisac.fragility.exposure.PointExposureEvaluator;
+import gov.lanl.nisac.fragility.gis.IFeature;
+import gov.lanl.nisac.fragility.gis.IFeatureCollection;
 import gov.lanl.nisac.fragility.gis.RasterField;
 import gov.lanl.nisac.fragility.hazards.HazardField;
 import gov.lanl.nisac.fragility.hazards.IHazardField;
 import gov.lanl.nisac.fragility.io.AssetData;
 import gov.lanl.nisac.fragility.io.AssetDataStore;
+import gov.lanl.nisac.fragility.io.ExposureData;
 import gov.lanl.nisac.fragility.io.HazardFieldData;
 import gov.lanl.nisac.fragility.io.HazardFieldDataStore;
 import gov.lanl.nisac.fragility.io.RasterDataFieldFactory;
@@ -29,11 +38,17 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -48,20 +63,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * customization of how models are executed within the framework.
  */
 public class Fragility {
-	
-	private static FragilityEngine engine;
-	
+
+	private static FragilityEngine responseEngine;
+
+	private static IExposureEngine exposureEngine;
+
 	private static String inputfile;
-	
+
 	private static String outputfile;
-	
+
 	private static AssetDataStore assetDataStore;
 
 	private static HazardFieldDataStore hazardFieldDataStore;
 
 	private static ResponseEstimatorDataStore responseEstimatorDataStore;
-	
+
 	private static List<IResponse> responses = new ArrayList<>();
+
+	private static List<IExposure> exposures = new ArrayList<>();
 
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -69,54 +88,42 @@ public class Fragility {
 
 	private static final ResponseEstimatorFactory estimatorFactory = new ResponseEstimatorFactory();
 
-	
+	private static String schemaURI = null;
+
+	private static boolean exposureOnly = false;
+
+	private static boolean validateInput = false;
+
+
 	public Fragility(){}
-	
+
 	public static void main(String[] args){
 		startUp(args);
 		run();
-		output();
+		outputResults();
 	}
 
 	private static void startUp(String[] args) {
-		// Usage is:
-		//     SimpleFragilityEngine inputFile outputFile <-schema schemaURL>
-		if(args.length<2){
-			System.err.println("Usage is Fragility inputFile outputFile <-schema schemaURL>");
-			System.exit(1);
-		}
 
-		inputfile = args[0];
-		outputfile = args[1];
+		// Parse the command line.
+		FragilityCommandLineParser parser = new FragilityCommandLineParser(args);
+		inputfile = parser.getInputPath();
+		outputfile = parser.getOutputPath();
+		exposureOnly = parser.isExposureOnly();
+		validateInput = parser.isValidateInput();
+		schemaURI = parser.getSchemaURI();
 
-		String schemaKey = null;
-		String schemaURLVal = null;		
-		URL schemaURL = null;
-		boolean validate = false;
-
-		if(args.length==4){
-			schemaKey = args[2];
-			schemaURLVal = args[3];
-			if(schemaKey.equals("-schema")){
-				validate = true;
-			} else {
-				System.err.println("Validation option -schema schemaURL expected.");
-				System.exit(1);
-			}
-		}
-		
-		// Configure the fragility engine instance.
-		// TODO This is fixed to the default engine for now, but will use a creation pattern based on
-		// configuration input later.
-		engine = new DefaultFragilityEngine();
+		// Configure the fragility and exposure engine instances.
+		exposureEngine = new DefaultExposureEngine();
+		responseEngine = new DefaultFragilityEngine();
 
 		// Read the input data. Validate against schema if required.
 		InputStream instream = null;
 		JSONSchemaValidator validator = null;
 		try {
 			instream = new FileInputStream(inputfile);
-			if(validate){
-				schemaURL = new URL(schemaURLVal);
+			if(validateInput){
+				URL schemaURL = new URL(schemaURI);
 				validator = new JacksonJSONSchemaValidator(schemaURL,true);
 				JSONSchemaValidatorReport report = validator.validate(instream);
 				if(!report.isSuccess()){
@@ -137,10 +144,13 @@ public class Fragility {
 			parseHazardFields(root.findValue("hazardFields"));
 			System.out.println(hazardFieldDataStore.size()+" hazard fields stored.");
 
-			// Parse the response estimator data.
-			parseResponseEstimators(root.findValue("responseEstimators"));
-			System.out.println(responseEstimatorDataStore.size()+" response estimators instantiated.");
-		
+			// Parse the response estimator data if present.
+			JsonNode responseEstimatorRoot = root.findValue("responseEstimators");
+			if(responseEstimatorRoot!=null){
+				parseResponseEstimators(responseEstimatorRoot);
+				System.out.println(responseEstimatorDataStore.size()+" response estimators instantiated.");
+			}
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (MalformedURLException e) {
@@ -149,16 +159,28 @@ public class Fragility {
 	}
 
 	private static void run() {
-		responses = engine.execute(assetDataStore, hazardFieldDataStore, responseEstimatorDataStore);
-		
+		if(exposureOnly){
+			IExposureEvaluator exposureEvaluator = new PointExposureEvaluator();
+			exposures = exposureEngine.execute(assetDataStore, hazardFieldDataStore, exposureEvaluator);
+		} else{
+			responses = responseEngine.execute(assetDataStore, hazardFieldDataStore, responseEstimatorDataStore);
+		}
+
 	}
 
-	private static void output() {
-		// Output the response data.
-		writeJSONOutput(outputfile, responses);
-		System.out.println("Fragility results written. Fragility analysis complete.");		
+	private static void outputResults() {
+		if(exposureOnly){
+			// Output the exposure data.
+			writeJSONExposureOutput();
+			System.out.println("Asset exposures written.");
+		} else{
+			// Output the response data.
+			writeJSONResponseOutput();
+			System.out.println("Asset responses written.");		
+		}
+		System.out.println("Analysis complete.");
 	}
-	
+
 	private static JsonNode readJSONInput(InputStream instream) {
 		try {
 			JsonNode root = objectMapper.readTree(instream);
@@ -249,8 +271,39 @@ public class Fragility {
 		}		
 
 	}
+
+	// TODO Specialized to point exposure values. Needs to be generalized.
+	private static void writeJSONExposureOutput() {
+		try {
+			int nexposures = exposures.size();
+			ExposureData[] exposureData = new ExposureData[nexposures];
+			for(int i=0;i<nexposures;i++){
+				IExposure exposure = exposures.get(i);
+				ExposureData data = new ExposureData();
+				IAsset asset = exposure.getAsset();
+				data.setAssetID(asset.getID());
+				data.setAssetClass(asset.getAssetClass());
+				IHazardField hazardField = exposure.getHazardField();
+				data.setHazardQuantityType(hazardField.getHazardQuantityType());
+				IFeature feature = exposure.getExposure().getFeature(0);
+				IProperty exposureProperty = feature.getProperty("exposure");
+				data.setValue((double)exposureProperty.getValue());
+				exposureData[i] = data;
+			}
+			FileOutputStream os = new FileOutputStream(outputfile);
+			objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, exposureData);
+			os.close();
+		}catch (JsonProcessingException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	
-	private static void writeJSONOutput(String outputfile, List<IResponse> responses) {
+	private static void writeJSONResponseOutput() {
 		try {
 			int nresponses = responses.size();
 			ResponseData[] responseData = new ResponseData[nresponses];
@@ -262,8 +315,6 @@ public class Fragility {
 				data.setHazardQuantityType(response.getHazardQuantityType());
 				data.setResponseQuantityType(response.getResponseQuantityType());
 				data.setValue(response.getValue());
-				//String s = objectMapper.writerWithDefaultPrettyPrinter().withView(ResponseData.class).writeValueAsString(data);
-				//System.out.println(s);
 				responseData[i] = data;
 			}
 			FileOutputStream os = new FileOutputStream(outputfile);
@@ -276,9 +327,10 @@ public class Fragility {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
-
 	}
+
+
+
 
 
 }

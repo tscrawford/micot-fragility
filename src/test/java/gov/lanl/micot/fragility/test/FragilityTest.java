@@ -1,4 +1,4 @@
-package gov.lanl.micot.fragility;
+package gov.lanl.micot.fragility.test;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
