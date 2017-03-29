@@ -1,17 +1,26 @@
-FROM maven:3-jdk-8
+FROM gfm:lanl
 MAINTAINER John Ambrosiano <ambro@lanl.gov>
 
+# For LANL proxy if needed.
 #ENV http_proxy "http://proxyout.lanl.gov:8080"
 #ENV https_proxy "http://proxyout.lanl.gov:8080"
 #RUN echo 'Acquire::http::proxy "http://proxyout.lanl.gov:8080";' > /etc/apt/apt.conf
 
+# Establish a working directory for the container.
 RUN mkdir /fragility
 WORKDIR /fragility
+
+# Copy the Maven POM for this project and the source tree to the working directory.
 COPY pom.xml .
 COPY src/ src/
-COPY settings.xml $MAVEN_CONFIG/
-RUN mvn install
 
+# Copy the local maven settings file into the containers Maven configuration.
+COPY settings.xml $MAVEN_CONFIG/
+
+# Run Maven to build the application.
+RUN mvn install -DskipTests
+
+# Define a default entry point and command option.
 ENTRYPOINT ["java","-jar","target/Fragility.jar"]
 CMD ["--help"]
 
