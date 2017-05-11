@@ -1,5 +1,10 @@
 package gov.lanl.micot.fragility;
 
+import gov.lanl.micot.fragility.lpnorm.NetworkDataStore;
+import gov.lanl.micot.fragility.lpnorm.NetworkLine;
+import gov.lanl.micot.fragility.lpnorm.NetworkNode;
+import gov.lanl.micot.fragility.lpnorm.RDTData;
+import gov.lanl.micot.fragility.lpnorm.RDTScenarios;
 import gov.lanl.nisac.fragility.assets.IAsset;
 import gov.lanl.nisac.fragility.core.IProperty;
 import gov.lanl.nisac.fragility.core.Properties;
@@ -32,6 +37,7 @@ import gov.lanl.nisac.fragility.responseEstimators.AbstractResponseEstimator;
 import gov.lanl.nisac.fragility.responseEstimators.ResponseEstimatorFactory;
 import gov.lanl.nisac.fragility.responseModels.IResponse;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -40,8 +46,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -51,9 +59,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A main class for the Fragility framework. The class reads the input and builds the data objects. 
- * It then delegates execution to an instance of a class that implements FragilityEngine. This allows
- * customization of how models are executed within the framework.
+ * A main class for the Fragility framework. The class reads the input and
+ * builds the data objects. It then delegates execution to an instance of a
+ * class that implements FragilityEngine. This allows customization of how
+ * models are executed within the framework.
  */
 public class Fragility {
 
@@ -66,6 +75,8 @@ public class Fragility {
 	private static String outputfile;
 
 	private static AssetDataStore assetDataStore;
+
+	private static NetworkDataStore networkDataStore; // network topology
 
 	private static HazardFieldDataStore hazardFieldDataStore;
 
@@ -83,14 +94,20 @@ public class Fragility {
 
 	private static String schemaURI = null;
 
+	private static String lpnormNetwork = null;
+
 	private static boolean exposureOnly = false;
 
 	private static boolean validateInput = false;
 
+	private static boolean lpnormOnly = false;
 
-	public Fragility(){}
+	private static ResponseData[] responseData;
 
-	public static void main(String[] args){
+	public Fragility() {
+	}
+
+	public static void main(String[] args) {
 		startUp(args);
 		run();
 		outputResults();
@@ -104,7 +121,10 @@ public class Fragility {
 		outputfile = parser.getOutputPath();
 		exposureOnly = parser.isExposureOnly();
 		validateInput = parser.isValidateInput();
+		lpnormOnly = parser.isLpnormOnly();
+
 		schemaURI = parser.getSchemaURI();
+		lpnormNetwork = parser.getLpnormNetwork();
 
 		// Configure the fragility and exposure engine instances.
 		exposureEngine = new DefaultExposureEngine();
@@ -112,14 +132,16 @@ public class Fragility {
 
 		// Read the input data. Validate against schema if required.
 		InputStream instream = null;
+		InputStream instreamLpnorm = null;
+
 		JSONSchemaValidator validator = null;
 		try {
 			instream = new FileInputStream(inputfile);
-			if(validateInput){
+			if (validateInput) {
 				URL schemaURL = new URL(schemaURI);
-				validator = new JacksonJSONSchemaValidator(schemaURL,true);
+				validator = new JacksonJSONSchemaValidator(schemaURL, true);
 				JSONSchemaValidatorReport report = validator.validate(instream);
-				if(!report.isSuccess()){
+				if (!report.isSuccess()) {
 					System.out.println(report);
 				}
 				// Reset input stream for reading.
@@ -131,17 +153,32 @@ public class Fragility {
 
 			// Parse the asset data.
 			parseAssetData(root.findValue("assets"));
-			System.out.println(assetDataStore.size()+" assets stored.");
+			System.out.println(assetDataStore.size() + " assets stored.");
 
 			// Parse the hazard data.
 			parseHazardFields(root.findValue("hazardFields"));
-			System.out.println(hazardFieldDataStore.size()+" hazard fields stored.");
+			System.out.println(hazardFieldDataStore.size() + " hazard fields stored.");
 
 			// Parse the response estimator data if present.
 			JsonNode responseEstimatorRoot = root.findValue("responseEstimators");
-			if(responseEstimatorRoot!=null){
+			if (responseEstimatorRoot != null) {
 				parseResponseEstimators(responseEstimatorRoot);
-				System.out.println(responseEstimatorDataStore.size()+" response estimators instantiated.");
+				System.out.println(responseEstimatorDataStore.size() + " response estimators instantiated.");
+			}
+
+			// LPNORM Option --
+			if (lpnormOnly) {
+
+				// temporary LPNORM option to read-in Power Network topology
+				System.out.println("*** Running LPNORM option *** ");
+				instreamLpnorm = new FileInputStream(lpnormNetwork);
+
+				JsonNode rootlpnorm = readJSONInput(instreamLpnorm);
+				System.out.println("Network data read successfully.");
+
+				// Parse the asset data.
+				parseNetworkTopology(rootlpnorm.findValue("graphs"));
+
 			}
 
 		} catch (FileNotFoundException e) {
@@ -152,26 +189,106 @@ public class Fragility {
 	}
 
 	private static void run() {
-		if(exposureOnly){
+		if (exposureOnly) {
 			IExposureEvaluator exposureEvaluator = new PointExposureEvaluator();
 			exposures = exposureEngine.execute(assetDataStore, hazardFieldDataStore, exposureEvaluator);
-		} else{
+		} else if (lpnormOnly) {
+			// probably not necessary -- same call as a non-lpnorm run...
+			responses = responseEngine.execute(assetDataStore, hazardFieldDataStore, responseEstimatorDataStore);
+		} else {
 			responses = responseEngine.execute(assetDataStore, hazardFieldDataStore, responseEstimatorDataStore);
 		}
 
 	}
 
 	private static void outputResults() {
-		if(exposureOnly){
+		if (exposureOnly) {
 			// Output the exposure data.
 			writeJSONExposureOutput();
 			System.out.println("Asset exposures written.");
-		} else{
+		} else {
 			// Output the response data.
 			writeJSONResponseOutput();
-			System.out.println("Asset responses written.");		
+			
 		}
 		System.out.println("Analysis complete.");
+	}
+
+	/**
+	 * write RDT Input file as Output
+	 */
+
+	private static void generateRdtInput(ResponseData[] data) {
+		// calculate down lines and write RDT input
+
+		Random r = new Random();
+		List<String> lineIds = new ArrayList<String>();
+
+		for (ResponseData rd : data) {
+
+			// if response > rand(0,1) --> line is disabled
+			if (rd.getValue() > r.nextFloat()) {
+
+				// get damaged line(s)
+				List<String> lineItr = networkDataStore.getNodeLineId(rd.getAssetID());
+
+				if (!lineItr.isEmpty()) {
+					lineItr.forEach((damagedLine) -> {
+						if (!lineIds.contains(damagedLine)) {
+							// collecting damaged lines
+							lineIds.add(damagedLine);
+						}
+					});
+				}
+			}
+		} // end for loop
+
+		// read-in Template RDT file
+		RDTData rdt = null;
+		RDTData rdtFile = readRDT("RDT_template.json");
+
+		// add disabled lines
+		RDTScenarios scene = new RDTScenarios();
+		scene.setId("1");
+		List<RDTScenarios> lscenario = new ArrayList<RDTScenarios>();
+		scene.setDisable_lines(new ArrayList<String>(lineIds));
+		lscenario.add(scene);
+		rdtFile.setScenarios(lscenario);
+
+		writeLpnorm(outputfile, rdtFile);
+
+	}
+
+	private static void writeLpnorm(String fileName, RDTData rdtFile) {
+
+		try {
+			FileOutputStream os = new FileOutputStream(fileName);
+			objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, rdtFile);
+			os.close();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			System.out.println("RDT JSON processing issue.");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Could not write RDT input.");
+		}
+
+	}
+
+	private static RDTData readRDT(String fileName) {
+		// read-in Template RDT file
+		RDTData rdt = null;
+
+		try {
+			rdt = objectMapper.readValue(new File(fileName), RDTData.class);
+		} catch (IOException e) {
+			System.out.println("Could not read template RDT input file");
+			e.printStackTrace();
+		}
+
+		return rdt;
 	}
 
 	private static JsonNode readJSONInput(InputStream instream) {
@@ -190,10 +307,10 @@ public class Fragility {
 
 	private static void parseAssetData(JsonNode node) {
 		assetDataStore = new AssetDataStore();
-		if(node.isArray()){
-			for(JsonNode n: node){
+		if (node.isArray()) {
+			for (JsonNode n : node) {
 				try {
-					JsonParser parser = jsonFactory.createParser(n.toString());					
+					JsonParser parser = jsonFactory.createParser(n.toString());
 					AssetData aData = objectMapper.readValue(parser, AssetData.class);
 					IAsset asset = aData.createAsset();
 					assetDataStore.addAsset(asset);
@@ -206,12 +323,49 @@ public class Fragility {
 		}
 	}
 
+	private static void parseNetworkTopology(JsonNode node) {
+		networkDataStore = new NetworkDataStore();
+		NetworkNode singleNode = null;
+		NetworkLine singleLine = null;
+
+		if (node.isArray()) {
+			JsonNode lpnormLines = node.findValue("lines");
+			JsonNode lpnormNodes = node.findValue("nodes");
+
+			// storing network lines
+			for (JsonNode n : lpnormLines) {
+				try {
+					JsonParser parser = jsonFactory.createParser(n.toString());
+					singleLine = objectMapper.readValue(parser, NetworkLine.class);
+					networkDataStore.addLine(singleLine);
+				} catch (JsonParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			// storing network nodes
+			for (JsonNode n : lpnormNodes) {
+				try {
+					JsonParser parser = jsonFactory.createParser(n.toString());
+					singleNode = objectMapper.readValue(parser, NetworkNode.class);
+					networkDataStore.addNode(singleNode);
+				} catch (JsonParseException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	private static void parseHazardFields(JsonNode node) {
 		hazardFieldDataStore = new HazardFieldDataStore();
-		if(node.isArray()){
-			for(JsonNode n: node){
+		if (node.isArray()) {
+			for (JsonNode n : node) {
 				try {
-					JsonParser parser = jsonFactory.createParser(n.toString());					
+					JsonParser parser = jsonFactory.createParser(n.toString());
 					HazardFieldData hazardFieldData = objectMapper.readValue(parser, HazardFieldData.class);
 					String id = hazardFieldData.getId();
 					String hazardQuantityType = hazardFieldData.getHazardQuantityType();
@@ -225,35 +379,36 @@ public class Fragility {
 					e.printStackTrace();
 				}
 			}
-		}		
+		}
 	}
 
 	private static void parseResponseEstimators(JsonNode node) {
 		responseEstimatorDataStore = new ResponseEstimatorDataStore();
-		if(node.isArray()){
-			for(JsonNode n: node){
+		if (node.isArray()) {
+			for (JsonNode n : node) {
 				try {
-					JsonParser parser = jsonFactory.createParser(n.toString());					
-					ResponseEstimatorData responseEstimatorData =
-							objectMapper.readValue(parser, ResponseEstimatorData.class);
+					JsonParser parser = jsonFactory.createParser(n.toString());
+					ResponseEstimatorData responseEstimatorData = objectMapper.readValue(parser,
+							ResponseEstimatorData.class);
 					String id = responseEstimatorData.getId();
 					String responseEstimatorClass = responseEstimatorData.getResponseEstimatorClass();
-					String assetClass = responseEstimatorData.getAssetClass();							
+					String assetClass = responseEstimatorData.getAssetClass();
 					List<String> hazardQuantityList = new ArrayList<>();
 					String[] hazardQuantityTypes = responseEstimatorData.getHazardQuantityTypes();
-					for(String type: hazardQuantityTypes){hazardQuantityList.add(type);}
-					String responseQuantityType = responseEstimatorData.getResponseQuantityType();				
+					for (String type : hazardQuantityTypes) {
+						hazardQuantityList.add(type);
+					}
+					String responseQuantityType = responseEstimatorData.getResponseQuantityType();
 					Map<String, Object> dataProperties = responseEstimatorData.getProperties();
 
 					Properties properties = new Properties();
-					for(String key: dataProperties.keySet()){
-						Property prop = new Property(key,dataProperties.get(key));
+					for (String key : dataProperties.keySet()) {
+						Property prop = new Property(key, dataProperties.get(key));
 						properties.addProperty(prop);
 					}
-					AbstractResponseEstimator responseEstimator =
-							(AbstractResponseEstimator) estimatorFactory.createResponseEstimator(id,
-									responseEstimatorClass, assetClass, hazardQuantityList, responseQuantityType,
-									properties);
+					AbstractResponseEstimator responseEstimator = (AbstractResponseEstimator) estimatorFactory
+							.createResponseEstimator(id, responseEstimatorClass, assetClass, hazardQuantityList,
+									responseQuantityType, properties);
 					responseEstimatorDataStore.addResponseEstimator(responseEstimator);
 				} catch (JsonParseException e) {
 					e.printStackTrace();
@@ -261,7 +416,7 @@ public class Fragility {
 					e.printStackTrace();
 				}
 			}
-		}		
+		}
 
 	}
 
@@ -270,7 +425,7 @@ public class Fragility {
 		try {
 			int nexposures = exposures.size();
 			ExposureData[] exposureData = new ExposureData[nexposures];
-			for(int i=0;i<nexposures;i++){
+			for (int i = 0; i < nexposures; i++) {
 				IExposure exposure = exposures.get(i);
 				ExposureData data = new ExposureData();
 				IAsset asset = exposure.getAsset();
@@ -280,13 +435,13 @@ public class Fragility {
 				data.setHazardQuantityType(hazardField.getHazardQuantityType());
 				IFeature feature = exposure.getExposure().getFeature(0);
 				IProperty exposureProperty = feature.getProperty("exposure");
-				data.setValue((double)exposureProperty.getValue());
+				data.setValue((double) exposureProperty.getValue());
 				exposureData[i] = data;
 			}
 			FileOutputStream os = new FileOutputStream(outputfile);
 			objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, exposureData);
 			os.close();
-		}catch (JsonProcessingException e) {
+		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -295,12 +450,12 @@ public class Fragility {
 		}
 	}
 
-	
 	private static void writeJSONResponseOutput() {
+
 		try {
 			int nresponses = responses.size();
-			ResponseData[] responseData = new ResponseData[nresponses];
-			for(int i=0;i<nresponses;i++){
+			responseData = new ResponseData[nresponses];
+			for (int i = 0; i < nresponses; i++) {
 				IResponse response = responses.get(i);
 				ResponseData data = new ResponseData();
 				data.setAssetID(response.getAssetID());
@@ -310,20 +465,34 @@ public class Fragility {
 				data.setValue(response.getValue());
 				responseData[i] = data;
 			}
-			FileOutputStream os = new FileOutputStream(outputfile);
-			objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, responseData);
-			os.close();
-		}catch (JsonProcessingException e) {
+			if (lpnormOnly) {
+
+				System.out.println("Writing RDT input.");
+				generateRdtInput(responseData);
+
+			} else {
+				FileOutputStream os = new FileOutputStream(outputfile);
+				objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, responseData);
+				os.close();
+				System.out.println("Asset responses written.");
+			}
+
+		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 	}
 
+	public static String getLpnormNetwork() {
+		return lpnormNetwork;
+	}
 
-
-
+	public static void setLpnormNetwork(String lpnormNetwork) {
+		Fragility.lpnormNetwork = lpnormNetwork;
+	}
 
 }

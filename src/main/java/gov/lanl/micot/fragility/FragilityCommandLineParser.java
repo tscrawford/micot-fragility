@@ -17,8 +17,11 @@ public class FragilityCommandLineParser {
 	private String inputPath = null;
 	private String outputPath = null;
 	private String schemaURI = null;
+	private String lpnormNetwork = null;
+	private String lpnormOutPath = null;
 	private boolean validateInput = false;
 	private boolean exposureOnly = false;
+	private boolean isLpnormOnly = false;
 	
 	
 	public FragilityCommandLineParser(String[] args) {
@@ -32,6 +35,10 @@ public class FragilityCommandLineParser {
 		options.addOption(new Option("s","schema",true,"validate schema using JSON schema at given URI"));
 		options.getOption("s").setArgName("JSON_SCHEMA_URI");
 		options.addOption(new Option("e","exposure",false,"evaluate exposure only"));
+		options.addOption(new Option("l","lpnorm",true,"lpnorm implementation - network topology"));
+		options.getOption("l").setArgName("NETWORK_TOPOLOGY");
+		options.addOption(new Option("d","scenario number",false,"scenario number appended to ouptut"));
+		
 		return options;
 	}
 	
@@ -41,8 +48,9 @@ public class FragilityCommandLineParser {
 		PrintWriter writer = new PrintWriter(swriter);
 		String header = "fragility <INPUT_FILE_PATH> <OUTPUT_FILE_PATH> [OPTIONS]\n options:\n";
 		String footer = 
-				"\nExamples:\nfragility input.json output.json --exposure\n"+
-				"fragility input.json output.json --schema http://org.lanl.fragility/schemas/fragilitySchema.json\n";
+				"\nExamples:\n\nFragility.jar  <input.json> <output.json> --exposure\n\n"+
+				"Fragility.jar <input.json> <output.json> --schema http://org.lanl.fragility/schemas/fragilitySchema.json \n\n"+
+				"Fragility.jar <input.json> <output.json> <RDToutput.json> --lpnorm <networkFile.json>\n\n";
 		formatter.printHelp(writer, 100, header, "\n", options, 4, 4, footer);
 		System.out.println(swriter.toString());
 	}
@@ -81,6 +89,12 @@ public class FragilityCommandLineParser {
 		    if(commandLine.hasOption("exposure")){
 		    	exposureOnly=true;
 		    }
+		    
+		    if(commandLine.hasOption("lpnorm")){
+		    	isLpnormOnly=true;
+		    	lpnormNetwork = commandLine.getOptionValue("lpnorm");
+		    	
+		    }
 		}
 		catch( ParseException exp ) {
 		    printUsage();
@@ -110,6 +124,22 @@ public class FragilityCommandLineParser {
 	
 	public boolean isExposureOnly() {
 		return exposureOnly;
+	}
+	
+	public boolean isLpnormOnly() {
+		return isLpnormOnly;
+	}
+
+	public String getLpnormNetwork() {
+		return lpnormNetwork;
+	}
+
+	public String getLpnormOutPath() {
+		return lpnormOutPath;
+	}
+
+	public void setLpnormOutPath(String lpnormOutPath) {
+		this.lpnormOutPath = lpnormOutPath;
 	}
 
 }
