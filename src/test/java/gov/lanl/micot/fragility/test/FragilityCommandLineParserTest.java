@@ -18,13 +18,13 @@ public class FragilityCommandLineParserTest extends TestCase {
 		}
 		System.out.print("\n");
 		FragilityCommandLineParser parser = new FragilityCommandLineParser(args1);
-		String inputPath = parser.getInputPath();
-		assertTrue(inputPath.equals("input.json"));
-		System.out.println("Input path = "+inputPath);
-		
-		String outputPath = parser.getOutputPath();
-		assertTrue(outputPath.equals("output.json"));
-		System.out.println("Output path = "+outputPath);
+//		String inputPath = parser.getInputPath();
+//		assertTrue(inputPath.equals("input.json"));
+//		System.out.println("Input path = "+inputPath);
+//
+//		String outputPath = parser.getOutputPath();
+//		assertTrue(outputPath.equals("output.json"));
+//		System.out.println("Output path = "+outputPath);
 		
 		String schemaURI = parser.getSchemaURI();
 		assertTrue(schemaURI.equals("http://org.lanl.fragility/schemas/fragilitySchema.json"));
@@ -41,14 +41,14 @@ public class FragilityCommandLineParserTest extends TestCase {
 			System.out.print(arg+" ");
 		}
 		System.out.print("\n");		
-		parser = new FragilityCommandLineParser(args2);
-		inputPath = parser.getInputPath();
-		assertTrue(inputPath.equals("input.json"));
-		System.out.println("Input path = "+inputPath);
-		
-		outputPath = parser.getOutputPath();
-		assertTrue(outputPath.equals("output.json"));
-		System.out.println("Output path = "+outputPath);
+//		parser = new FragilityCommandLineParser(args2);
+//		inputPath = parser.getInputPath();
+//		assertTrue(inputPath.equals("input.json"));
+//		System.out.println("Input path = "+inputPath);
+//
+//		outputPath = parser.getOutputPath();
+//		assertTrue(outputPath.equals("output.json"));
+//		System.out.println("Output path = "+outputPath);
 
 		schemaURI = parser.getSchemaURI();
 		assertTrue(schemaURI==null);
