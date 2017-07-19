@@ -14,8 +14,6 @@ import org.apache.commons.cli.ParseException;
 public class FragilityCommandLineParser {
 	
 	private static Options options = defineOptions();
-	//private String inputPath = null;
-	//private String outputPath = null;
 	private String schemaURI = null;
 	private boolean validateInput = false;
 	private boolean exposureOnly = false;
@@ -28,6 +26,8 @@ public class FragilityCommandLineParser {
 	private boolean hasPoles = false;
 	private boolean hasWindField = false;
 	private boolean hasOutputFileName = false;
+	private int numberOfScenarios;
+	private boolean numScenarios = false;
 	
 	public FragilityCommandLineParser(String[] args) {
 		defineOptions();
@@ -53,6 +53,9 @@ public class FragilityCommandLineParser {
 				"Wind field Esri Ascii input"));
 		options.addOption(new Option("o","output",true,
 				"output file name"));
+		options.addOption(new Option("num","numScenario",true,
+				"Number of Scenarios"));
+
 		return options;
 	}
 	
@@ -106,6 +109,11 @@ public class FragilityCommandLineParser {
 		    if(commandLine.hasOption("rdt")){
 				hasRdt = true;
 				rdtInputPath = commandLine.getOptionValue("rdt");
+			}
+
+			if(commandLine.hasOption("num")){
+				numScenarios = true;
+				numberOfScenarios = Integer.parseInt(commandLine.getOptionValue("num"));
 			}
 
 			if(commandLine.hasOption("output")){
@@ -178,4 +186,11 @@ public class FragilityCommandLineParser {
 		return hasOutputFileName;
 	}
 
+	public int getNumberOfScenarios() {
+		return numberOfScenarios;
+	}
+
+	public boolean isNumScenarios() {
+		return numScenarios;
+	}
 }

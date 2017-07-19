@@ -1,4 +1,4 @@
-package gov.lanl.micot.fragility.lpnorm;
+package gov.lanl.micot.fragility.lpnorm.Poles;
 
 /**
  * Created by 301338 on 6/27/2017.
@@ -8,8 +8,8 @@ public class PoleRasterFieldData {
     private String uri;
     private String gridFormat;
     private String crsCode;
-    private String nBands;
-    private String rasterBand;
+    private int nBands;
+    private int rasterBand;
     private String valueType;
 
 
@@ -37,19 +37,19 @@ public class PoleRasterFieldData {
         this.crsCode = crsCode;
     }
 
-    public String getnBands() {
+    public int getnBands() {
         return nBands;
     }
 
-    public void setnBands(String nBands) {
+    public void setnBands(int nBands) {
         this.nBands = nBands;
     }
 
-    public String getRasterBand() {
+    public int getRasterBand() {
         return rasterBand;
     }
 
-    public void setRasterBand(String rasterBand) {
+    public void setRasterBand(int rasterBand) {
         this.rasterBand = rasterBand;
     }
 

@@ -1,4 +1,4 @@
-package gov.lanl.micot.fragility.lpnorm;
+package gov.lanl.micot.fragility.lpnorm.RDT;
 
 public class RDTGenerators {
 

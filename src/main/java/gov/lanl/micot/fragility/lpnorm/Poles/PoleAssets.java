@@ -1,7 +1,4 @@
-package gov.lanl.micot.fragility.lpnorm;
-
-import java.util.ArrayList;
-import java.util.List;
+package gov.lanl.micot.fragility.lpnorm.Poles;
 
 /**
  * Created by 301338 on 6/26/2017.

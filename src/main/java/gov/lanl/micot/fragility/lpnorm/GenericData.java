@@ -1,5 +1,8 @@
 package gov.lanl.micot.fragility.lpnorm;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 /**
  * Created by Trevor Crawford on 6/14/2017.
  */
@@ -10,6 +13,8 @@ public class GenericData {
     private String id;
     private String cableSpan;
     private String uriPath;
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public void setLat(String num){
         this.lat = num;

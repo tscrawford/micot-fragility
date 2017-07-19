@@ -1,5 +1,8 @@
-package gov.lanl.micot.fragility.lpnorm;
+package gov.lanl.micot.fragility.lpnorm.RDT;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class RDTScenarios {
@@ -9,6 +12,7 @@ public class RDTScenarios {
 	private List<String> disable_lines;
 
 	public RDTScenarios() {
+		hardened_disabled_lines = new ArrayList<>();
 	}
 
 	public List<String> getHardened_disabled_lines() {
@@ -22,6 +26,7 @@ public class RDTScenarios {
 	public List<String> getDisable_lines() {
 		return disable_lines;
 	}
+
 
 	public void setDisable_lines(List<String> disable_lines) {
 		this.disable_lines = disable_lines;

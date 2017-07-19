@@ -1,4 +1,4 @@
-package gov.lanl.micot.fragility.lpnorm;
+package gov.lanl.micot.fragility.lpnorm.RDT;
 
 import java.util.List;
 
@@ -9,10 +9,10 @@ public class RDTData {
 	private List<RDTGenerators> generators;
 	private List<RDTLineCodes> line_codes;
 	private List<RDTLines> lines;
-	private String critical_load_met;
-	private String total_load_met;
-	private String chance_constraint;
-	private String phase_variation;
+	private float critical_load_met;
+	private float total_load_met;
+	private float chance_constraint;
+	private float phase_variation;
 	private List<RDTScenarios> scenarios;
 	
 	
@@ -50,35 +50,35 @@ public class RDTData {
 		this.line_codes = line_codes;
 	}
 
-	public String getCritical_load_met() {
+	public float getCritical_load_met() {
 		return critical_load_met;
 	}
 
-	public void setCritical_load_met(String critical_load_met) {
+	public void setCritical_load_met(float critical_load_met) {
 		this.critical_load_met = critical_load_met;
 	}
 
-	public String getTotal_load_met() {
+	public float getTotal_load_met() {
 		return total_load_met;
 	}
 
-	public void setTotal_load_met(String total_load_met) {
+	public void setTotal_load_met(float total_load_met) {
 		this.total_load_met = total_load_met;
 	}
 
-	public String getChance_constraint() {
+	public float getChance_constraint() {
 		return chance_constraint;
 	}
 
-	public void setChance_constraint(String chance_constraint) {
+	public void setChance_constraint(float chance_constraint) {
 		this.chance_constraint = chance_constraint;
 	}
 
-	public String getPhase_variation() {
+	public float getPhase_variation() {
 		return phase_variation;
 	}
 
-	public void setPhase_variation(String phase_variation) {
+	public void setPhase_variation(float phase_variation) {
 		this.phase_variation = phase_variation;
 	}
 

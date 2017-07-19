@@ -1,8 +1,10 @@
 package gov.lanl.micot.fragility;
 
-import gov.lanl.micot.fragility.lpnorm.*;
+import gov.lanl.micot.fragility.lpnorm.Poles.*;
+import gov.lanl.micot.fragility.lpnorm.RDT.*;
+import gov.lanl.micot.fragility.FragilityCommandLineParser;
+
 import gov.lanl.nisac.fragility.assets.IAsset;
-import gov.lanl.nisac.fragility.core.IProperties;
 import gov.lanl.nisac.fragility.core.IProperty;
 import gov.lanl.nisac.fragility.core.Properties;
 import gov.lanl.nisac.fragility.core.Property;
@@ -44,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.Key;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonFactory;
@@ -83,29 +86,29 @@ public class Fragility{
 	private static boolean rdtData = false;
 	private static boolean windFieldData = false;
 	private static boolean poleData = false;
-	private static String rdtPath;
-	private static String hazardFieldPath;
-	private static String polesPath;
 
 	private static RDTData rdt;
-	private static GenericData gp;
+	private static PoleData polesData;
+	private static HashMap<String,String> nodeToLine;
+	private static FragilityCommandLineParser clp;
 
 
 	public Fragility() {
 	}
 
 	public static void main(String[] args) {
+
 		startUp(args);
 		run();
 		outputResults();
+
 	}
 
 	private static void startUp(String[] args) {
 
-		gp = new GenericData();
 
 		// Parse the command line.
-		FragilityCommandLineParser clp = new FragilityCommandLineParser(args);
+		clp = new FragilityCommandLineParser(args);
 
 		exposureOnly = clp.isExposureOnly();
 		boolean validateInput = clp.isValidateInput();
@@ -118,11 +121,13 @@ public class Fragility{
 			outputfile = "OUTPUT.json";
 		}
 		rdtData = clp.hasRdt();
+
 		if (rdtData) {
-			polesPath = clp.getRdtInputPath();
+			String rdtPath = clp.getRdtInputPath();
 		}
 
 		poleData = clp.hasPoles();
+		String polesPath;
 		if (poleData) {
 			polesPath = clp.getPolesInputPath();
 		}
@@ -158,8 +163,7 @@ public class Fragility{
 						if (!report.isSuccess()) {
 							System.out.println(report);
 						}
-						// Reset input stream for reading.
-						//instream = new FileInputStream(inputfile);
+
 					}
 				}
 
@@ -183,21 +187,24 @@ public class Fragility{
 			System.exit(0);
 		}
 
-		if (windFieldData && rdtData && !poleData){
+		if (windFieldData && rdtData){
 			System.out.println("Hazard field and RDT only options....");
 			rdt = readRDT(parser.getRdtInputPath());
 			inferPoleData(rdt);
 		}
-		else if(rdtData && poleData){
+		else if(rdtData &&  !windFieldData){
 			System.out.println("RDT and Pole data options...");
 			rdt = readRDT(parser.getRdtInputPath());
 			InputStream instream = null;
+			System.out.println(parser.getPolesInputPath());
+			inferPoleData(rdt);
 
 			try {
 				instream = new FileInputStream(parser.getPolesInputPath());
 				JsonNode root = readJSONInput(instream);
 
 				//Parse the asset data.
+				assert root != null;
 				parseAssetData(root.findValue("assets"));
 				System.out.println(assetDataStore.size() + " assets stored.");
 
@@ -215,38 +222,10 @@ public class Fragility{
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
+
 		}
-		else if(windFieldData && rdtData && poleData){
-			InputStream instream = null;
 
-			try {
-				instream = new FileInputStream(parser.getPolesInputPath());
-				JsonNode root = readJSONInput(instream);
-
-				//Parse the asset data.
-				parseAssetData(root.findValue("assets"));
-				System.out.println(assetDataStore.size() + " assets stored.");
-
-				// Parse the hazard data.
-				parseHazardFields(root.findValue("hazardFields"));
-				System.out.println(hazardFieldDataStore.size() + " hazard fields stored.");
-
-				// Parse the response estimator data if present.
-				JsonNode responseEstimatorRoot = root.findValue("responseEstimators");
-				if (responseEstimatorRoot != null) {
-					parseResponseEstimators(responseEstimatorRoot);
-					System.out.println(responseEstimatorDataStore.size() + " response estimators instantiated.");
-				}
-
-				outputfile = "OUT.json";
-
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-
-			rdt = readRDT(parser.getRdtInputPath());
-
-		} else if( poleData && (!rdtData && !windFieldData)){
+		else if( poleData ){
 			System.out.println("Only pole data...");
 
 			InputStream instream = null;
@@ -277,18 +256,61 @@ public class Fragility{
 		}
 	}
 
+	private static PoleAssets definePole(int id, String line, double[] coord){
+
+		PoleAssets pole = new PoleAssets();
+		PoleProperties poleProperty = new PoleProperties();
+
+		pole.setAssetGeometry(new PoleAssetGeometry());
+		pole.getAssetGeometry().setCoordinates(coord);
+		pole.getAssetGeometry().setType("Point");
+		pole.setAssetClass("PowerDistributionPole");
+		pole.setId(String.valueOf(id));
+		pole.setProperties( poleProperty );
+
+		poleProperty.setBaseDiameter((float) 0.2222);
+		poleProperty.setCableSpan((float) 90.0);
+		poleProperty.setCommAttachmentHeight((float) 4.7244);
+		poleProperty.setCommCableDiameter((float) 0.04 );
+		poleProperty.setCommCableNumber(2);
+		poleProperty.setCommCableWireDensity((float) 2700.0);
+		poleProperty.setHeight((float)9.144);
+		poleProperty.setMeanPoleStrength((float) 38600000.0);
+		poleProperty.setPowerAttachmentHeight((float) 5.6388);
+		poleProperty.setPowerCableDiameter((float)0.0094742 );
+		poleProperty.setPowerCableNumber(2);
+		poleProperty.setPowerCableWireDensity((float) 2700.0);
+
+		poleProperty.setLineId(line);
+		poleProperty.setPowerCircuitName(String.valueOf(id));
+		poleProperty.setStdDevPoleStrength((float) 7700000.0);
+		poleProperty.setTopDiameter((float) 0.15361635107);
+		poleProperty.setWoodDensity((float) 500.0);
+
+		return pole;
+	}
+
+
+
 	private static void inferPoleData(RDTData rdtFile) {
 		System.out.println("Producing generic pole data . . .");
 		assetDataStore = new AssetDataStore();
 
 		List<RDTLines> rdtline = rdtFile.getLines();
-		List<RDTBuses> rdtbuses = rdtFile.getBuses();
+		HashMap<String,String> nodeToLine = new HashMap<>();
 
-		//GenericData gp = new GenericData();
+		for (RDTLines i : rdtline){
+			nodeToLine.put(i.getNode1_id(), i.getId());
+			nodeToLine.put(i.getNode2_id(), i.getId());
+		}
+
+		List<RDTBuses> rdtbuses = rdtFile.getBuses();
+		List<PoleAssets> assets = new ArrayList();
+		PoleAssets npa;
 
 		HashMap<String, List<Double>> ht = new HashMap<>();
-
-		String bid=null;
+		int id_count=0;
+		String bid,name=null;
 
 		for (RDTBuses bus : rdtbuses) {
 			bid = bus.getId();
@@ -296,30 +318,34 @@ public class Fragility{
 			ht.get(bid).add(new Double(bus.getX()));
 			ht.get(bid).add(new Double(bus.getY()));
 
-			gp.setId(bid);
-			gp.setLat(String.valueOf(bus.getY()));
-			gp.setLon(String.valueOf(bus.getX()));
-			gp.setCableSpan("90.000");
 
 			try  {
-				JsonParser jp = jsonFactory.createParser(gp.getPoleString());
+
+				String busId = nodeToLine.get(bus.getId());
+				npa = definePole(id_count, busId, new double[]{bus.getX(), bus.getY()});
+				assets.add(npa);
+				String npastr = objectMapper.writeValueAsString(npa);
+				JsonParser jp = jsonFactory.createParser(npastr);
 				AssetData aData = objectMapper.readValue(jp, AssetData.class);
 				IAsset asset = aData.createAsset();
 				assetDataStore.addAsset(asset);
+
 
 			} catch (JsonParseException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
+			id_count +=1;
+		}// end for
 
 		// adding poles between buses
 		String node1=null;
 		String node2=null;
+		String lid=null;
 		double v1,v2,x0,y0 ;
-		double ndist, numPoles, poleSpan;
-		int id_count=0;
+		double ndist, numPoles;
+
 
 		for (RDTLines line : rdtline){
 			node1 = line.getNode1_id();
@@ -334,21 +360,23 @@ public class Fragility{
 			v1 = v1/ndist;
 			v2 = v2/ndist;
 
-			// using 111.32 km per degree or 111,320 meters
+			// using 111.111 km per degree or 111,111 meters
 			// pole spacing at 91 meters 0.000817463169242 degrees
-			//0.000817463169242
-			numPoles = Math.floor(ndist*111320)/ 91.0;
+			// 0.000817463169242
+			numPoles = Math.floor(ndist*111111)/ 91.0;
 			numPoles = Math.floor(numPoles);
-			id_count = 0;
-			for(int i=0; i < numPoles; i++){
 
-				gp.setId(node1+"-"+node2+"-"+id_count);
-				gp.setLat(String.valueOf(y0));
-				gp.setLon(String.valueOf(x0));
-				gp.setCableSpan("90.0000");
+//			id_count = 0;
+			for(int i=0; i < numPoles; i++){
+				lid = line.getId();
 
 				try  {
-					JsonParser jp = jsonFactory.createParser(gp.getPoleString());
+					npa = definePole(id_count, lid, new double[]{x0, y0});
+					assets.add(npa);
+
+					String npastr = objectMapper.writeValueAsString(npa);
+					JsonParser jp = jsonFactory.createParser(npastr);
+
 					AssetData aData = objectMapper.readValue(jp, AssetData.class);
 					IAsset asset = aData.createAsset();
 					assetDataStore.addAsset(asset);
@@ -366,7 +394,13 @@ public class Fragility{
 
 			}
 			// spacing at 91 meters ~ 300 ft
-		}
+		}// end for
+
+		System.out.println("Number of poles created: "+assets.size());
+
+		polesData = new PoleData();
+		polesData.setAssets(assets);
+
 
 
 		IResponseEstimator responseEstimator = new  PowerPoleWindStressEstimator("PowerPoleWindStressEstimator");;
@@ -375,24 +409,79 @@ public class Fragility{
 
 		hazardFieldDataStore = new HazardFieldDataStore();
 
-		JsonParser parser = null;
-		gp.setFileUI("C:/Users/301338/Desktop/PROJECTS/fragility/micot-fragility/target/wf_clip.asc");
+		if(!poleData) {
 
-		try {
-			parser = jsonFactory.createParser(gp.getHazardFields());
-			HazardFieldData hazardFieldData = objectMapper.readValue(parser, HazardFieldData.class);
-			String id = hazardFieldData.getId();
-			String hazardQuantityType = hazardFieldData.getHazardQuantityType();
-			RasterFieldData rasterFieldData = hazardFieldData.getRasterFieldData();
-			RasterField rasterField = RasterDataFieldFactory.createRasterField(rasterFieldData);
-			IHazardField hazardField = new HazardField(id, hazardQuantityType, rasterField);
-			hazardFieldDataStore.addHazardField(hazardField);
-		} catch (IOException e) {
-			e.printStackTrace();
+			JsonParser parser = null;
+			String urlpath = null;
+			try {
+				urlpath = String.valueOf(new File(System.getProperty("user.dir")).toURI().toURL());
+				urlpath = urlpath.substring(6);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+
+			urlpath = urlpath + clp.getWindFieldInputPath();
+
+			List<PoleHazardFields> hfl = new ArrayList<>();
+			PoleHazardFields phf = new PoleHazardFields();
+			phf.setRasterFieldData(new PoleRasterFieldData());
+			phf.getRasterFieldData().setCrsCode("EPSG:4326");
+			phf.getRasterFieldData().setGridFormat("ArcGrid");
+			phf.getRasterFieldData().setnBands(1);
+			phf.getRasterFieldData().setRasterBand(1);
+			phf.getRasterFieldData().setValueType("double");
+			phf.getRasterFieldData().setUri("file:///" + urlpath);
+			phf.setId("GFM-generated-ID");
+
+			List<PoleResponseEstimators> pre = new ArrayList<>();
+			PoleResponseEstimators pr = new PoleResponseEstimators();
+			pr.setId("PowerPoleWindStressEstimator");
+			pr.setResponseEstimatorClass("PowerPoleWindStressEstimator");
+			pr.setAssetClass("PowerDistributionPole");
+			pr.setProperties(new PoleResponseEstimatorsProperties());
+
+			List<String> ls = new ArrayList<>();
+			ls.add("Windspeed");
+			pr.setHazardQuantityTypes(ls);
+			pr.setResponseQuantityType("DamageProbability");
+			pre.add(pr);
+
+			phf.setHazardQuantityType("Windspeed");
+			hfl.add(phf);
+			polesData.setResponseEstimators(pre);
+			polesData.setHazardFields(hfl);
+			writePoleData("RDT-to-Poles.json", polesData);
+
+			// Fragility's hazard class
+			HazardFieldData hdd = new HazardFieldData();
+			hdd.setRasterFieldData(new RasterFieldData());
+			hdd.getRasterFieldData();
+			hdd.getRasterFieldData().setUri("file:///" + urlpath);
+			hdd.getRasterFieldData().setnBands(1);
+			hdd.getRasterFieldData().setRasterBand(1);
+			hdd.getRasterFieldData().setCrsCode("EPSG:4326");
+			hdd.setHazardQuantityType("Windspeed");
+			hdd.getRasterFieldData().setGridFormat("ArcGrid");
+			hdd.getRasterFieldData().setValueType(Double.class);
+			hdd.setId("TesGrid");
+
+			try {
+				parser = jsonFactory.createParser(objectMapper.writeValueAsString(hdd));
+				HazardFieldData hazardFieldData = objectMapper.readValue(parser, HazardFieldData.class);
+				String id = hazardFieldData.getId();
+				String hazardQuantityType = hazardFieldData.getHazardQuantityType();
+				RasterFieldData rasterFieldData = hdd.getRasterFieldData();
+				RasterField rasterField = RasterDataFieldFactory.createRasterField(rasterFieldData);
+				IHazardField hazardField = new HazardField(id, hazardQuantityType, rasterField);
+				hazardFieldDataStore.addHazardField(hazardField);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			System.out.println(hazardFieldDataStore.size() + " hazard fields stored.");
 		}
-
-		System.out.println(hazardFieldDataStore.size() + " hazard fields stored.");
 	}
+
 
 	private static void run() {
 
@@ -409,14 +498,17 @@ public class Fragility{
 	}
 
 	private static void outputResults() {
+
 		if (exposureOnly) {
 			// Output the exposure data.
 			writeJSONExposureOutput();
 			System.out.println("Asset exposures written.");
-		} else {
+		} else if(poleData){
+			writeJSONResponseOutput();
+		}
+			else {
 			// Output the response data.
 			writeJSONResponseOutput();
-
 		}
 		System.out.println("Analysis complete.");
 	}
@@ -428,61 +520,90 @@ public class Fragility{
 	private static void generateRdtInput(ResponseData[] data) {
 		// calculate down lines and write RDT input
 		// add disabled lines
-		Random r = new Random();
-		List<String> lineIds = new ArrayList<>();
 
-		Random rand = new Random();
+		//List<String> lineIds = new ArrayList<>();
+
 		String uniqueId = null;
 		String damagedLine = null;
-		int idx1, idx2;
+		int idx1;
 
 		List<RDTLines> rdtlines = rdt.getLines();
 		HashMap<List<String>, String> nodesmap = new HashMap<>();
 		List<String> ns;
 
-
 		for(RDTLines line: rdtlines){
 			ns = new ArrayList<>();
-			ns.add(line.getNode1_id());
-			ns.add(line.getNode2_id());
+			ns.add(line.getId());
 			nodesmap.put(ns, line.getId());
 		}
 
-		int count = 0;
-		for (ResponseData rd : data) {
+		int numTimes = 0;
 
-			// if response > rand(0,1) --> line is disabled
-			if (rd.getValue() > r.nextFloat()) {
+		if (clp.isNumScenarios())numTimes = clp.getNumberOfScenarios();
+		else numTimes = 1;
 
-				count+=1;
-				uniqueId = rd.getAssetID();
+		int timeCt = 0;
+		RDTScenarios scene;
+		List<RDTScenarios> lscenario = new ArrayList<>();
+		List<String> lineIds;
+		Random r = new Random();
 
-				if (uniqueId.contains("-")){
-					idx1 = uniqueId.indexOf("-");
-					idx2 = uniqueId.lastIndexOf("-");
+		HashMap<String, String> poleToLine = new HashMap<>();
+		for (PoleAssets pa : polesData.getAssets()) poleToLine.put(pa.getId(), pa.getProperties().getLineId());
+
+		do {
+
+			lineIds = new ArrayList<>();
+			scene =  new RDTScenarios();
+
+			for (ResponseData rd : data) {
+
+				// if response > rand(0,1) --> line is disabled
+
+
+				if (rd.getValue() > r.nextFloat()) {
+
+					uniqueId = poleToLine.get(rd.getAssetID());
 
 					ns = new ArrayList<>();
-					ns.add(uniqueId.substring(0,idx1)); // node 1
-					ns.add(uniqueId.substring(idx1+1,idx2)); // node 2
-
+					ns.add(uniqueId); // line id
 					damagedLine = nodesmap.get(ns);
 
 					if (!lineIds.contains(damagedLine)){
-						// collect damaged lines
-						lineIds.add(damagedLine);
+							// collect damaged lines
+							lineIds.add(damagedLine);
 					}
-
 				}
-			}
-		} // end for loop
+			} // end for loop
 
-		RDTScenarios scene = new RDTScenarios();
-		scene.setId("1");
-		List<RDTScenarios> lscenario = new ArrayList<>();
-		scene.setDisable_lines(new ArrayList<>(lineIds));
-		lscenario.add(scene);
+			scene.setId(String.valueOf(timeCt));
+			scene.setDisable_lines(new ArrayList<>(lineIds));
+			lscenario.add(scene);
+			timeCt +=1;
+
+		}while(timeCt < numTimes);
+
 		rdt.setScenarios(lscenario);
 		writeLpnorm("rdt_"+outputfile, rdt);
+
+	}
+
+	private static void writePoleData(String fileName, PoleData pd) {
+
+		try {
+			FileOutputStream os = new FileOutputStream(fileName);
+			objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, pd);
+			os.close();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			System.out.println("RDT JSON processing issue.");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Could not write RDT input.");
+		}
+
 	}
 
 	private static void writeLpnorm(String fileName, RDTData rdtFile) {
@@ -517,6 +638,20 @@ public class Fragility{
 		return rdt;
 	}
 
+	private static PoleData readPoleData(String fileName) {
+		// read-in Template RDT file
+		PoleData pd = null;
+
+		try {
+			pd = objectMapper.readValue(new File(fileName), PoleData.class);
+		} catch (IOException e) {
+			System.out.println("Could not read template RDT input file");
+			e.printStackTrace();
+		}
+
+		return pd;
+	}
+
 	private static JsonNode readJSONInput(InputStream instream) {
 		try {
 			return objectMapper.readTree(instream);
@@ -539,6 +674,7 @@ public class Fragility{
 					AssetData aData = objectMapper.readValue(parser, AssetData.class);
 					IAsset asset = aData.createAsset();
 					assetDataStore.addAsset(asset);
+
 				} catch (JsonParseException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -661,7 +797,16 @@ public class Fragility{
 				os.close();
 				System.out.println("Asset responses written.");
 
-			} else {
+			} else if (poleData){
+//				generateRdtInput(responseData);
+				generateRdtScenarioBlock(responseData);
+				FileOutputStream os = new FileOutputStream("fragility_"+outputfile);
+				objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, responseData);
+				os.close();
+				System.out.println("Asset responses written.");
+			}
+			else {
+				generateRdtInput(responseData);
 				FileOutputStream os = new FileOutputStream("fragility_"+outputfile);
 				objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, responseData);
 				os.close();
@@ -674,6 +819,64 @@ public class Fragility{
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private static void generateRdtScenarioBlock(ResponseData[] data) {
+
+		int numTimes;
+		int timeCt = 0;
+
+		if (clp.isNumScenarios()) numTimes = clp.getNumberOfScenarios();
+		else numTimes = 1;
+
+		RDTScenarios rs = new RDTScenarios();
+		rs.setDisable_lines(new ArrayList<>());
+		Random r = new Random();
+
+		List<String> ns;
+		RDTScenarios scene = null;
+		List<RDTScenarios> lscenario = new ArrayList<>();
+
+		do {
+			scene =  new RDTScenarios();
+			ns = new ArrayList<>();
+
+			for (ResponseData rd : data) {
+
+				// if response > rand(0,1) --> line is disabled
+				if (rd.getValue() > r.nextFloat()) {
+					String lineId = null;
+					lineId =assetDataStore.getAsset("PowerDistributionPole",rd.getAssetID()).getID();
+					if (!ns.contains(lineId)){
+						// collect damaged lines
+						ns.add(lineId);
+					}
+				}
+			} // end for loop
+
+			scene.setId(String.valueOf(timeCt));
+			scene.setDisable_lines(new ArrayList<>(ns));
+			lscenario.add(scene);
+			timeCt +=1;
+
+		}while(timeCt < numTimes);
+
+		RDTScenarioBlock rsb = new RDTScenarioBlock();
+		rsb.setScenarios(lscenario);
+
+		try {
+			FileOutputStream os = new FileOutputStream("RDTScenarioBlock.json");
+			objectMapper.writerWithDefaultPrettyPrinter().writeValue(os, rsb);
+			os.close();
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+			System.out.println("RDTScenarioBlock JSON processing issue.");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("Could not write RDTScenarioBlock.");
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package gov.lanl.micot.fragility.lpnorm;
+package gov.lanl.micot.fragility.lpnorm.Poles;
 
 /**
  * Created by 301338 on 6/26/2017.
@@ -21,6 +21,7 @@ public class PoleProperties {
     private float stdDevPoleStrength;
     private float topDiameter;
     private float woodDensity;
+    private String lineId;
 
 
     public PoleProperties(){}
@@ -154,5 +155,13 @@ public class PoleProperties {
 
     public void setBaseDiameter(float baseDiameter) {
         this.baseDiameter = baseDiameter;
+    }
+
+    public String getLineId() {
+        return lineId;
+    }
+
+    public void setLineId(String lineId) {
+        this.lineId = lineId;
     }
 }
