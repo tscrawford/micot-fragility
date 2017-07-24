@@ -5,8 +5,8 @@ public class RDTGenerators {
 	private String id;
 	private String node_id;
 	private boolean[] has_phase;
-	private float[] max_real_phase;
-	private float[] max_reactive_phase;
+	private double[] max_real_phase;
+	private double[] max_reactive_phase;
 	private float microgrid_cost;
 	private float microgrid_fixed_cost;
 	private float max_microgrid;
@@ -39,19 +39,19 @@ public class RDTGenerators {
 		this.has_phase = has_phase;
 	}
 
-	public float[] getMax_real_phase() {
+	public double[] getMax_real_phase() {
 		return max_real_phase;
 	}
 
-	public void setMax_real_phase(float[] max_real_phase) {
+	public void setMax_real_phase(double[] max_real_phase) {
 		this.max_real_phase = max_real_phase;
 	}
 
-	public float[] getMax_reactive_phase() {
+	public double[] getMax_reactive_phase() {
 		return max_reactive_phase;
 	}
 
-	public void setMax_reactive_phase(float[] max_reactive_phase) {
+	public void setMax_reactive_phase(double[] max_reactive_phase) {
 		this.max_reactive_phase = max_reactive_phase;
 	}
 
