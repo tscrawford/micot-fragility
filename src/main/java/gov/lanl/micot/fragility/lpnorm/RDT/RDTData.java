@@ -1,5 +1,7 @@
 package gov.lanl.micot.fragility.lpnorm.RDT;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 public class RDTData {
@@ -9,11 +11,14 @@ public class RDTData {
 	private List<RDTGenerators> generators;
 	private List<RDTLineCodes> line_codes;
 	private List<RDTLines> lines;
-	private float critical_load_met;
-	private float total_load_met;
-	private float chance_constraint;
-	private float phase_variation;
+	private float critical_load_met = 0.98f;
+	private float total_load_met = 0.5f;
+	private float chance_constraint = 1.0f;
+	private float phase_variation = 0.15f;
 	private List<RDTScenarios> scenarios;
+	private float mva_base = 100.0f;
+	private String algorithm = "sbd";
+	private String solver = "scip";
 	
 	
 	public RDTData() {}
@@ -97,6 +102,29 @@ public class RDTData {
 	public void setLines(List<RDTLines> lines) {
 		this.lines = lines;
 	}
-	
-	
+
+
+	public float getMva_base() {
+		return mva_base;
+	}
+
+	public void setMva_base(float mva_base) {
+		this.mva_base = mva_base;
+	}
+
+	public String getAlgorithm() {
+		return algorithm;
+	}
+
+	public void setAlgorithm(String algorithm) {
+		this.algorithm = algorithm;
+	}
+
+	public String getSolver() {
+		return solver;
+	}
+
+	public void setSolver(String solver) {
+		this.solver = solver;
+	}
 }

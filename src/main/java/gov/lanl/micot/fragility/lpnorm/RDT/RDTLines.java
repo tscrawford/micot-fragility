@@ -1,24 +1,24 @@
 package gov.lanl.micot.fragility.lpnorm.RDT;
 
-import java.util.List;
-
 public class RDTLines{
 
 	private String id;
 	private String node1_id;
 	private String node2_id;
 	private boolean[] has_phase;
-	private float capacity;
-	private float length;
-	private int num_phases;
-	private boolean is_transformer;
+	private double capacity = 1e30;
+	private float length = 1.0f;
+	private int num_phases = 3;
+	private boolean is_transformer = false;
 	private int line_code;
 	private int num_poles;
-	private float harden_cost;
-	private float switch_cost;
-	private boolean is_new;
-	private boolean has_switch;
-	private float construction_cost;
+	private double harden_cost = 1e30;
+	private double switch_cost = 1e30;
+	private boolean is_new = false;
+	private boolean has_switch = false;
+	private double construction_cost = 1e30;
+	private boolean can_harden = true;
+	private boolean can_add_switch = true;
 
 	public RDTLines() {
 	}
@@ -47,11 +47,11 @@ public class RDTLines{
 		this.node2_id = node2_id;
 	}
 
-	public float getCapacity() {
+	public double getCapacity() {
 		return capacity;
 	}
 
-	public void setCapacity(float capacity) {
+	public void setCapacity(double capacity) {
 		this.capacity = capacity;
 	}
 
@@ -95,19 +95,19 @@ public class RDTLines{
 		this.num_poles = num_poles;
 	}
 
-	public float getHarden_cost() {
+	public double getHarden_cost() {
 		return harden_cost;
 	}
 
-	public void setHarden_cost(float harden_cost) {
+	public void setHarden_cost(double harden_cost) {
 		this.harden_cost = harden_cost;
 	}
 
-	public float getSwitch_cost() {
+	public double getSwitch_cost() {
 		return switch_cost;
 	}
 
-	public void setSwitch_cost(float switch_cost) {
+	public void setSwitch_cost(double switch_cost) {
 		this.switch_cost = switch_cost;
 	}
 
@@ -135,12 +135,27 @@ public class RDTLines{
 		this.has_phase = has_phase;
 	}
 
-	public float getConstruction_cost() {
+	public double getConstruction_cost() {
 		return construction_cost;
 	}
 
-	public void setConstruction_cost(float construction_cost) {
+	public void setConstruction_cost(double construction_cost) {
 		this.construction_cost = construction_cost;
 	}
 
+	public boolean isCan_harden() {
+		return can_harden;
+	}
+
+	public void setCan_harden(boolean can_harden) {
+		this.can_harden = can_harden;
+	}
+
+	public boolean isCan_add_switch() {
+		return can_add_switch;
+	}
+
+	public void setCan_add_switch(boolean can_add_switch) {
+		this.can_add_switch = can_add_switch;
+	}
 }

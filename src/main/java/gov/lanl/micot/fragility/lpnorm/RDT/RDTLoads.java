@@ -7,7 +7,7 @@ public class RDTLoads {
 	private boolean[] has_phase;
 	private float[] max_real_phase;
 	private float[] max_reactive_phase;
-	private boolean is_critical;
+	private boolean is_critical = false;
 
 	public RDTLoads() {
 	}

@@ -107,7 +107,6 @@ public class Fragility{
 
 	private static void startUp(String[] args) {
 
-
 		// Parse the command line.
 		clp = new FragilityCommandLineParser(args);
 
@@ -164,7 +163,6 @@ public class Fragility{
 						if (!report.isSuccess()) {
 							System.out.println(report);
 						}
-
 					}
 				}
 

@@ -1,15 +1,17 @@
 package gov.lanl.micot.fragility.lpnorm.RDT;
 
+
+
 public class RDTBuses {
 
 	private String id;
 	private double x;
 	private double y;
-	private float min_voltage;
-	private float max_voltage;
-	private float[] ref_voltage;
-	private boolean[] has_phase;
-	private boolean has_generator;
+	private float min_voltage = 0.8f;
+	private float max_voltage = 1.2f;
+	private float[] ref_voltage = {1.0f,1.0f,1.0f};
+	private boolean[] has_phase = {true,true,true};
+	private boolean has_generator = false;
 
 	public RDTBuses() {
 	}
