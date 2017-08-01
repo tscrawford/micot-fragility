@@ -94,7 +94,25 @@ A repository and Maven project for MICOT applications built on the General Fragi
         {
             "type": "number",
             "description": "Comm cable attachment height in meters."
-        }
+        },
+        "required": [
+            "height",
+            "baseDiameter",
+            "topDiameter",
+            "cableSpan",
+            "woodDensity",
+            "meanPoleStrength",
+            "stdDevPoleStrength",
+            "powerCableDiameter",
+            "powerCableNumber",
+            "powerCableWireDensity",
+            "powerCircuitName",
+            "powerAttachmentHeight",
+            "commCableNumber",
+            "commCableDiameter",
+            "commCableWireDensity",
+            "commAttachmentHeight"
+        ]
     }
 }
 
